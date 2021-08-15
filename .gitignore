@@ -1,0 +1,16 @@
+node_modules
+
+#Hardhat files
+cache
+artifacts
+factories
+
+.env
+
+# typechain generated
+types/generated
+
+# eslint cache
+.eslintcache
+
+.vscode
