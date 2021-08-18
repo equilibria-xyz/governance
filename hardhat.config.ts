@@ -66,7 +66,7 @@ const config: HardhatUserConfig = {
       forking: {
         url: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_KEY}`,
         enabled: FORK_ENABLED,
-        blockNumber: 12345678,
+        blockNumber: 13046798,
       },
       chainId: chainIds.hardhat,
     },

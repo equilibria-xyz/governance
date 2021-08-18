@@ -1,10 +1,8 @@
-import {} from 'ethers'
-import HRE from 'hardhat'
-import { Contract } from 'ethers'
+import path from 'path'
+import { ContractFactory } from 'ethers'
 import { writeFile } from 'fs/promises'
 import { readFileSync } from 'fs'
-
-const { ethers } = HRE
+import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
 type DeployConfig =  { [k: string]: NetworkConfig }
 type NetworkConfig = { [k: string]: string }
@@ -17,50 +15,52 @@ const NETWORK_MAP: { [k: string]: string } = {
 }
 
 export class Operator {
+  private HRE: HardhatRuntimeEnvironment
   private networkID: string
   private deployConfig: DeployConfig
   private networkConfig: NetworkConfig
 
-  constructor(deployJSONPath: string, networkID: string) {
-    const fileBuff = readFileSync(deployJSONPath)
+  constructor(HRE: HardhatRuntimeEnvironment, networkID: string) {
+    const fileBuff = readFileSync(path.join(process.cwd(), 'deploy/deploy.json'))
     const config = fileBuff.toString()
     this.networkID = networkID
     this.deployConfig = JSON.parse(config)
     this.networkConfig = this.deployConfig[networkID]
+    this.HRE = HRE
   }
 
-  getNetworkName(networkID: string): string {
-    if (networkID === "1337") {
+  getNetworkName(): string {
+    if (this.networkID === "1337") {
       return "ganache";
     }
-    if (networkID === "31337") {
+    if (this.networkID === "31337") {
       return "hardhat"
     }
 
-    return NETWORK_MAP[networkID] || "unknown"
+    return NETWORK_MAP[this.networkID] || "unknown"
   }
 
   getNetworkConfig(): NetworkConfig {
     return this.networkConfig
   }
 
-  async attachOrDeploy(
+  async attachOrDeploy<T>(
+    contractFactory: ContractFactory,
     contractName: string,
-    getArgs: () => any[]
-  ): Promise<Contract> {
-    const ContractFactory = await ethers.getContractFactory(contractName)
+    getArgs: () => unknown[]
+  ): Promise<T> {
     const address = this.addressForContract(contractName)
     if (address) {
       console.info(`${contractName} already deployed at ${address}\n`)
-      return ContractFactory.attach(address)
+      return contractFactory.attach(address) as unknown as  T
     }
 
 
-    const deployedContract = await ContractFactory.deploy(...getArgs())
+    const deployedContract = await contractFactory.deploy(...getArgs())
     this.writeAddress(contractName, deployedContract.address)
     console.info(`${contractName} deployed at ${deployedContract.address}\n`)
 
-    return deployedContract
+    return deployedContract as unknown as T
   }
 
   async setIfNot<T>(
