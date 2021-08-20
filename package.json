@@ -58,7 +58,7 @@
   "lint-staged": {
     "*.ts": "eslint --cache --fix",
     "*.sol": "solhint 'contracts/**/*.sol' --fix",
-    "*./": "prettier --write",
+    "*.*": "prettier --write",
     "*.js": "eslint --cache --fix"
   }
 }

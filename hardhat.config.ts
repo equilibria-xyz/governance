@@ -107,9 +107,9 @@ const config: HardhatUserConfig = {
     contracts: [{ artifacts: 'external/contracts' }],
     deployments: {
       mainnet: ['external/deployments/mainnet'],
-      hardhat: [FORK_ENABLED ? 'external/deployments/mainnet' : '']
-    }
-  }
+      hardhat: [FORK_ENABLED ? 'external/deployments/mainnet' : ''],
+    },
+  },
 }
 
 export default config
