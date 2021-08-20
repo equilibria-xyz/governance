@@ -12,6 +12,7 @@ import '@nomiclabs/hardhat-ethers'
 import '@nomiclabs/hardhat-waffle'
 import '@nomiclabs/hardhat-etherscan'
 import 'hardhat-gas-reporter'
+import 'hardhat-deploy'
 
 const chainIds = {
   ganache: 1337,
@@ -100,7 +101,15 @@ const config: HardhatUserConfig = {
   typechain: {
     outDir: 'types/generated',
     target: 'ethers-v5',
+    externalArtifacts: ['external/contracts/*.json', 'external/deployments/**/*.json'],
   },
+  external: {
+    contracts: [{ artifacts: 'external/contracts' }],
+    deployments: {
+      mainnet: ['external/deployments/mainnet'],
+      hardhat: [FORK_ENABLED ? 'external/deployments/mainnet' : '']
+    }
+  }
 }
 
 export default config

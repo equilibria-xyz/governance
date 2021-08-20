@@ -3,23 +3,27 @@ import { Signer } from 'ethers'
 import HRE from 'hardhat'
 
 import { time } from '../testutil'
-import { Operator } from '../../util/operator'
 import { EmptySetProp1Initializer__factory } from '../../types/generated/factories/EmptySetProp1Initializer__factory'
-import { EmptySetProp1Initializer } from '../../types/generated/EmptySetProp1Initializer'
+import { EmptySetShare__factory } from '../../types/generated/factories/EmptySetShare__factory'
 
-const { ethers } = HRE
+
+const { ethers, deployments } = HRE
 
 describe('EmptySetProp1Initializer', () => {
   let owner: Signer
-  const operator = new Operator(HRE, "1")
 
   beforeEach(async () => {
     [owner] = await ethers.getSigners()
   })
 
+  it('uses mainnet deployments', async () => {
+    const essAddress = (await deployments.get('EmptySetShare')).address
+    const ess = EmptySetShare__factory.connect(essAddress, owner)
+    expect(await ess.totalSupply()).to.equal('1952000000000000000000000000')
+  })
+
   it ('deploys the initializer', async () => {
-    const contract: EmptySetProp1Initializer = await operator.attachOrDeploy(
-      new EmptySetProp1Initializer__factory(owner), "EmptySetProp1Initializer", () => [])
+    const contract = await new EmptySetProp1Initializer__factory(owner).deploy()
     expect(await contract.RESERVE()).to.equal("0xD05aCe63789cCb35B9cE71d01e4d632a0486Da4B")
     expect(await ethers.provider.getBlockNumber()).to.eq(13046799)
     await time.increase(100)
