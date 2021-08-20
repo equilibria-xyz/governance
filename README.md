@@ -47,6 +47,7 @@ $ yarn test-integration
 ```
 
 ### Gas Report
+
 To get a gas report based on unit test calls:
 
 ```sh

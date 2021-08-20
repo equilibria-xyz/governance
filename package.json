@@ -41,6 +41,7 @@
     "ethereum-waffle": "^3.2.1",
     "ethers": "^5.3.1",
     "hardhat": "^2.0.10",
+    "hardhat-deploy": "^0.8.11",
     "hardhat-gas-reporter": "^1.0.4",
     "husky": ">=6",
     "lint-staged": ">=10",
@@ -57,7 +58,7 @@
   "lint-staged": {
     "*.ts": "eslint --cache --fix",
     "*.sol": "solhint 'contracts/**/*.sol' --fix",
-    "*./": "prettier --write",
+    "*.*": "prettier --write",
     "*.js": "eslint --cache --fix"
   }
 }

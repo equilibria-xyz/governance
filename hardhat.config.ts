@@ -12,6 +12,7 @@ import '@nomiclabs/hardhat-ethers'
 import '@nomiclabs/hardhat-waffle'
 import '@nomiclabs/hardhat-etherscan'
 import 'hardhat-gas-reporter'
+import 'hardhat-deploy'
 
 const chainIds = {
   ganache: 1337,
@@ -66,7 +67,7 @@ const config: HardhatUserConfig = {
       forking: {
         url: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_KEY}`,
         enabled: FORK_ENABLED,
-        blockNumber: 12345678,
+        blockNumber: 13046798,
       },
       chainId: chainIds.hardhat,
     },
@@ -100,6 +101,14 @@ const config: HardhatUserConfig = {
   typechain: {
     outDir: 'types/generated',
     target: 'ethers-v5',
+    externalArtifacts: ['external/contracts/*.json', 'external/deployments/**/*.json'],
+  },
+  external: {
+    contracts: [{ artifacts: 'external/contracts' }],
+    deployments: {
+      mainnet: ['external/deployments/mainnet'],
+      hardhat: [FORK_ENABLED ? 'external/deployments/mainnet' : ''],
+    },
   },
 }
 
