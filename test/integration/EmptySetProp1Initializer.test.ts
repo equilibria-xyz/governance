@@ -91,7 +91,7 @@ async function proposeProp1(
       [reserveAddress, initializerAddress],
       [0, 0],
       ['mintStake(address,amount)', 'start()'],
-      [mintStakeParams, ''],
+      [mintStakeParams, '0x'],
       'Upgrade the V1 implementation contract.',
     )
 }
