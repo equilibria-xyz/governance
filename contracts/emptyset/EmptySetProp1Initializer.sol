@@ -7,6 +7,8 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 contract EmptySetProp1Initializer {
     using SafeERC20 for IERC20;
 
+    event IncentivesInitialized(bytes32 dsuIncentiveId, bytes32 essIncentiveId);
+
     IERC20 public constant STAKE = IERC20(0x24aE124c4CC33D6791F8E8B63520ed7107ac8b3e);
     address public constant TIMELOCK = address(0x1bba92F379375387bf8F927058da14D47464cB7A);
     address public constant RESERVE = address(0xD05aCe63789cCb35B9cE71d01e4d632a0486Da4B);
@@ -16,35 +18,40 @@ contract EmptySetProp1Initializer {
     address public constant ESS_USDC_POOL = address(0);
 
     function start() external {
-        require(STAKE.balanceOf(address(this)) == 12_000_000 ether, "Prop1Initializer: incorrect stake");
+        require(STAKE.balanceOf(address(this)) == 8_000_000 ether, "Prop1Initializer: incorrect stake");
 
-        STAKER.createIncentive(
-            IUniswapV3Staker.IncentiveKey({
-                rewardToken: STAKE,
-                pool: DSU_USDC_POOL,
-                startTime: block.timestamp,
-                endTime: block.timestamp + 90 days,
-                refundee: RESERVE
-            }),
-            8_000_000 ether
-        );
+        STAKE.approve(address(STAKER), 8_000_000 ether);
 
-        STAKER.createIncentive(
-            IUniswapV3Staker.IncentiveKey({
-                rewardToken: STAKE,
-                pool: ESS_USDC_POOL,
-                startTime: block.timestamp,
-                endTime: block.timestamp + 90 days,
-                refundee: RESERVE
-            }),
-            4_000_000 ether
-        );
+        IUniswapV3Staker.IncentiveKey memory dsuIncentiveKey = IUniswapV3Staker.IncentiveKey({
+            rewardToken: STAKE,
+            pool: DSU_USDC_POOL,
+            startTime: block.timestamp,
+            endTime: block.timestamp + 90 days,
+            refundee: RESERVE
+        });
+
+        IUniswapV3Staker.IncentiveKey memory essIncentiveKey = IUniswapV3Staker.IncentiveKey({
+            rewardToken: STAKE,
+            pool: ESS_USDC_POOL,
+            startTime: block.timestamp,
+            endTime: block.timestamp + 90 days,
+            refundee: RESERVE
+        });
+
+        STAKER.createIncentive(dsuIncentiveKey, 8_000_000 ether);
+        //STAKER.createIncentive(essIncentiveKey, 4_000_000 ether);
 
         require(STAKE.balanceOf(address(this)) == 0, "Prop1Initializer: stake left over");
+
+        emit IncentivesInitialized(computeIncentiveId(dsuIncentiveKey), computeIncentiveId(essIncentiveKey));
     }
 
     function cancel() external {
         require(msg.sender == TIMELOCK, "Prop1Initializer: not timelock");
         STAKE.transfer(RESERVE, STAKE.balanceOf(address(this)));
+    }
+
+    function computeIncentiveId(IUniswapV3Staker.IncentiveKey memory key) private pure returns (bytes32) {
+        return keccak256(abi.encode(key));
     }
 }
