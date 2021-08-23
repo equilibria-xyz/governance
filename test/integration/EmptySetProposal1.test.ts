@@ -1,22 +1,16 @@
 import { expect } from 'chai'
 import { BigNumber, ContractReceipt, ContractTransaction, Signer } from 'ethers'
-import { Deployment } from 'hardhat-deploy/types'
 import HRE from 'hardhat'
 
-import { time } from '../testutil'
 import {
   EmptySetProp1Initializer,
-  EmptySetGovernor,
   EmptySetShare,
   UniswapV3Staker,
   EmptySetProp1Initializer__factory,
-  EmptySetGovernor__factory,
   EmptySetShare__factory,
   UniswapV3Staker__factory,
 } from '../../types/generated'
-import { impersonate } from '../testutil/impersonate'
-import { propose } from '../testutil/govern'
-import { reset } from '../testutil/time'
+import { govern, impersonate, time } from '../testutil'
 
 const { ethers, deployments } = HRE
 const ESS_ADDRESS = '0x07b991579b4e1Ee01d7a3342AF93E96ecC59E0B3'
@@ -32,9 +26,9 @@ describe('Empty Set Proposal 1', () => {
   let prop1Initializer: EmptySetProp1Initializer
 
   beforeEach(async () => {
-    reset(HRE.config)
+    time.reset(HRE.config)
     ;[funder] = await ethers.getSigners()
-    essSigner = await impersonate(ESS_ADDRESS, funder)
+    essSigner = await impersonate.impersonate(ESS_ADDRESS, funder)
 
     ess = EmptySetShare__factory.connect((await deployments.get('EmptySetShare')).address, funder)
     staker = UniswapV3Staker__factory.connect((await deployments.get('UniswapV3Staker')).address, funder)
@@ -44,7 +38,7 @@ describe('Empty Set Proposal 1', () => {
   //TODO: test ess incentives
   //TODO: better description
   it('starts the initializers', async () => {
-    const txExecute = await propose(
+    const txExecute = await govern.propose(
       (
         await deployments.get('EmptySetGovernor')
       ).address,
@@ -78,10 +72,10 @@ describe('Empty Set Proposal 1', () => {
     const incentives = await staker.incentives(dsuIncentiveId)
 
     expect(incentives.totalRewardUnclaimed).to.eq(DSU_INCENTIVE_AMOUNT)
-    expect(incentives.totalSecondsClaimedX128).to.eq(BigNumber.from(0))
-    expect(incentives.numberOfStakes).to.eq(BigNumber.from(0))
+    expect(incentives.totalSecondsClaimedX128).to.eq(0)
+    expect(incentives.numberOfStakes).to.eq(0)
 
-    expect(await ess.balanceOf(prop1Initializer.address)).to.equal(BigNumber.from(0))
+    expect(await ess.balanceOf(prop1Initializer.address)).to.equal(0)
     expect(await ess.balanceOf(staker.address)).to.equal(DSU_INCENTIVE_AMOUNT)
   }).timeout(60000)
 
@@ -89,7 +83,7 @@ describe('Empty Set Proposal 1', () => {
   it('cancels the initializers', async () => {
     const reserveBalanceBefore = await ess.balanceOf(RESERVE_ADDRESS)
 
-    await propose(
+    await govern.propose(
       (
         await deployments.get('EmptySetGovernor')
       ).address,
@@ -118,8 +112,8 @@ describe('Empty Set Proposal 1', () => {
       essSigner,
     )
 
-    expect(await ess.balanceOf(prop1Initializer.address)).to.equal(BigNumber.from(0))
-    expect(await ess.balanceOf(staker.address)).to.equal(BigNumber.from(0))
+    expect(await ess.balanceOf(prop1Initializer.address)).to.equal(0)
+    expect(await ess.balanceOf(staker.address)).to.equal(0)
     expect(await ess.balanceOf(RESERVE_ADDRESS)).to.equal(reserveBalanceBefore.add(DSU_INCENTIVE_AMOUNT))
   }).timeout(60000)
 })
