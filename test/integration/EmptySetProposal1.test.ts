@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { BigNumber, ContractReceipt, ContractTransaction, Signer } from 'ethers'
+import { ContractReceipt, ContractTransaction, Signer } from 'ethers'
 import HRE from 'hardhat'
 
 import {
@@ -35,8 +35,6 @@ describe('Empty Set Proposal 1', () => {
     prop1Initializer = await new EmptySetProp1Initializer__factory(funder).deploy()
   })
 
-  //TODO: test ess incentives
-  //TODO: better description
   it('starts the initializers', async () => {
     const txExecute = await govern.propose(
       (
@@ -52,7 +50,7 @@ describe('Empty Set Proposal 1', () => {
             value: 0,
             method: 'mintStake(address,uint256)',
             argTypes: ['address', 'uint256'],
-            argValues: [prop1Initializer.address, DSU_INCENTIVE_AMOUNT],
+            argValues: [prop1Initializer.address, DSU_INCENTIVE_AMOUNT.add(ESS_INCENTIVE_AMOUNT)],
           },
           {
             to: prop1Initializer.address,
@@ -69,17 +67,20 @@ describe('Empty Set Proposal 1', () => {
 
     const [dsuIncentiveId, essIncentiveId] = await parseIncentiveIds(txExecute)
 
-    const incentives = await staker.incentives(dsuIncentiveId)
+    const dsuIncentives = await staker.incentives(dsuIncentiveId)
+    expect(dsuIncentives.totalRewardUnclaimed).to.eq(DSU_INCENTIVE_AMOUNT)
+    expect(dsuIncentives.totalSecondsClaimedX128).to.eq(0)
+    expect(dsuIncentives.numberOfStakes).to.eq(0)
 
-    expect(incentives.totalRewardUnclaimed).to.eq(DSU_INCENTIVE_AMOUNT)
-    expect(incentives.totalSecondsClaimedX128).to.eq(0)
-    expect(incentives.numberOfStakes).to.eq(0)
+    const essIncentives = await staker.incentives(essIncentiveId)
+    expect(essIncentives.totalRewardUnclaimed).to.eq(ESS_INCENTIVE_AMOUNT)
+    expect(essIncentives.totalSecondsClaimedX128).to.eq(0)
+    expect(essIncentives.numberOfStakes).to.eq(0)
 
     expect(await ess.balanceOf(prop1Initializer.address)).to.equal(0)
-    expect(await ess.balanceOf(staker.address)).to.equal(DSU_INCENTIVE_AMOUNT)
+    expect(await ess.balanceOf(staker.address)).to.equal(DSU_INCENTIVE_AMOUNT.add(ESS_INCENTIVE_AMOUNT))
   }).timeout(60000)
 
-  //TODO: test ess incentives
   it('cancels the initializers', async () => {
     const reserveBalanceBefore = await ess.balanceOf(RESERVE_ADDRESS)
 
@@ -97,7 +98,7 @@ describe('Empty Set Proposal 1', () => {
             value: 0,
             method: 'mintStake(address,uint256)',
             argTypes: ['address', 'uint256'],
-            argValues: [prop1Initializer.address, DSU_INCENTIVE_AMOUNT],
+            argValues: [prop1Initializer.address, DSU_INCENTIVE_AMOUNT.add(ESS_INCENTIVE_AMOUNT)],
           },
           {
             to: prop1Initializer.address,
@@ -114,12 +115,14 @@ describe('Empty Set Proposal 1', () => {
 
     expect(await ess.balanceOf(prop1Initializer.address)).to.equal(0)
     expect(await ess.balanceOf(staker.address)).to.equal(0)
-    expect(await ess.balanceOf(RESERVE_ADDRESS)).to.equal(reserveBalanceBefore.add(DSU_INCENTIVE_AMOUNT))
+    expect(await ess.balanceOf(RESERVE_ADDRESS)).to.equal(
+      reserveBalanceBefore.add(DSU_INCENTIVE_AMOUNT).add(ESS_INCENTIVE_AMOUNT),
+    )
   }).timeout(60000)
 })
 
 async function parseIncentiveIds(tx: ContractTransaction) {
   const txExecuteReceipt: ContractReceipt = await tx.wait()
-  const rawData = txExecuteReceipt.logs[8].data
+  const rawData = txExecuteReceipt.logs[11].data
   return ethers.utils.defaultAbiCoder.decode(['bytes32', 'bytes32'], rawData)
 }
