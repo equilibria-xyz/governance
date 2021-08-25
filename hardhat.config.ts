@@ -13,6 +13,7 @@ import '@nomiclabs/hardhat-waffle'
 import '@nomiclabs/hardhat-etherscan'
 import 'hardhat-gas-reporter'
 import 'hardhat-deploy'
+import { ethers } from 'ethers'
 
 const chainIds = {
   ganache: 1337,
@@ -25,6 +26,7 @@ const chainIds = {
 }
 
 const MNEMONIC = process.env.MNEMONIC || ''
+const PRIVATE_KEY = process.env.PRIVATE_KEY || ''
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || ''
 const INFURA_API_KEY = process.env.INFURA_API_KEY || ''
 const ALCHEMY_KEY = process.env.ALCHEMY_KEY || ''
@@ -43,12 +45,7 @@ task('accounts', 'Prints the list of accounts', async (args, hre) => {
 function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig {
   const url = `https://${network}.infura.io/v3/${INFURA_API_KEY}`
   return {
-    accounts: {
-      count: 10,
-      initialIndex: 0,
-      mnemonic: MNEMONIC,
-      path: "m/44'/60'/0'/0",
-    },
+    accounts: [PRIVATE_KEY],
     chainId: chainIds[network],
     url,
   }
@@ -78,6 +75,7 @@ const config: HardhatUserConfig = {
     mainnet: {
       chainId: chainIds.mainnet,
       url: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_KEY}`,
+      accounts: [PRIVATE_KEY],
     },
   },
   solidity: {

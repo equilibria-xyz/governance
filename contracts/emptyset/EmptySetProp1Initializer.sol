@@ -15,7 +15,7 @@ contract EmptySetProp1Initializer {
 
     IUniswapV3Staker public constant STAKER = IUniswapV3Staker(0x1f98407aaB862CdDeF78Ed252D6f557aA5b0f00d);
     address public constant DSU_USDC_POOL = address(0x3432ef874A39BB3013e4d574017e0cCC6F937efD);
-    address public constant ESS_USDC_POOL = address(0xd2Ef54450ec52347bde3dab7B086bf2a005601d8);
+    address public constant ESS_WETH_POOL = address(0xd2Ef54450ec52347bde3dab7B086bf2a005601d8);
 
     function start() external {
         require(STAKE.balanceOf(address(this)) == 12_000_000 ether, "Prop1Initializer: incorrect stake");
@@ -32,7 +32,7 @@ contract EmptySetProp1Initializer {
 
         IUniswapV3Staker.IncentiveKey memory essIncentiveKey = IUniswapV3Staker.IncentiveKey({
             rewardToken: STAKE,
-            pool: ESS_USDC_POOL,
+            pool: ESS_WETH_POOL,
             startTime: block.timestamp,
             endTime: block.timestamp + 90 days,
             refundee: RESERVE
