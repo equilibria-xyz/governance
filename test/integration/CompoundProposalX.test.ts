@@ -47,6 +47,8 @@ describe('Compound Proposal X', () => {
     const prevTotalSupply = await cdai.totalSupply()
     const prevTotalBorrows = await cdai.totalBorrows()
     const prevTotalReserves = await cdai.totalReserves()
+    // This will return an error (old impl)
+    expect(await cdai.callStatic._setPendingAdmin(funder.address)).to.equal('1')
 
     const impl = await new CErc20DelegateNew__factory(funder).deploy()
     await govern.propose(
@@ -75,5 +77,7 @@ describe('Compound Proposal X', () => {
     expect(await cdai.totalSupply()).to.equal(prevTotalSupply)
     expect(await cdai.totalBorrows()).to.equal(prevTotalBorrows)
     expect(await cdai.totalReserves()).to.equal(prevTotalReserves)
+    // This will now revert with a custom error
+    await expect(cdai.callStatic._setPendingAdmin(funder.address)).to.be.reverted
   }).timeout(120000)
 })
