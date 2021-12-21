@@ -2,12 +2,7 @@ import { BigNumberish, ContractTransaction, Signer } from 'ethers'
 import HRE from 'hardhat'
 import { expect } from 'chai'
 import { time } from './index'
-import {
-  EmptySetGovernor,
-  EmptySetGovernor__factory,
-  EmptySetShare,
-  EmptySetShare__factory,
-} from '../../types/generated'
+import { COMP, COMP__factory, EmptySetGovernor, CompoundGovernor } from '../../types/generated'
 const { ethers } = HRE
 
 export interface Proposal {
@@ -20,55 +15,68 @@ export interface ProposalClause {
   value: BigNumberish
   method: string
   argTypes: string[]
-  argValues: any[]
+  argValues: unknown[]
 }
 
 export async function propose(
-  governorAddress: string,
+  governor: CompoundGovernor | EmptySetGovernor,
   tokenAddress: string,
   proposal: Proposal,
   proposer: Signer,
+  supporters: Signer[] = [],
+  compoundGovernor = false,
 ): Promise<ContractTransaction> {
-  const governor: EmptySetGovernor = EmptySetGovernor__factory.connect(governorAddress, proposer)
-  const token: EmptySetShare = EmptySetShare__factory.connect(tokenAddress, proposer)
+  console.log('>> Starting Proposal Flow')
+  const token: COMP = COMP__factory.connect(tokenAddress, proposer)
   const votingPower = await token.getCurrentVotes(await proposer.getAddress())
 
   await proposeTx(governor, proposal, proposer)
   const proposalId = await governor.proposalCount()
+  console.log('>> TX Proposed')
 
   expect(await governor.proposalCount()).to.eq(proposalId)
   expect(await governor.state(proposalId)).to.eq(0)
 
-  await time.advanceBlock()
-  await time.advanceBlock()
+  const currBlock = await ethers.provider.getBlockNumber()
+  const votingDelay = await governor.votingDelay()
+  await time.advanceBlockTo(currBlock + votingDelay.toNumber() + 1)
 
   expect(await governor.state(proposalId)).to.eq(1)
+  console.log('>> Proposal Active')
 
-  await governor.connect(proposer).castVote(proposalId, true)
+  if (compoundGovernor) {
+    await (governor.connect(proposer) as CompoundGovernor).castVote(proposalId, 1)
+    await Promise.all(supporters.map(async s => (governor.connect(s) as CompoundGovernor).castVote(proposalId, 1)))
+  } else {
+    await (governor.connect(proposer) as EmptySetGovernor).castVote(proposalId, true)
+    await Promise.all(supporters.map(async s => (governor.connect(s) as EmptySetGovernor).castVote(proposalId, true)))
+  }
+  console.log('>> Votes Cast')
 
   const receipt = await governor.getReceipt(proposalId, await proposer.getAddress())
   expect(receipt.hasVoted).to.eq(true)
-  expect(receipt.support).to.eq(true)
+  expect(receipt.support).to.eq(compoundGovernor ? 1 : true)
   expect(receipt.votes).to.eq(votingPower)
 
   const endBlock = (await governor.proposals(proposalId)).endBlock
   await time.advanceBlockTo(endBlock.toNumber() + 1)
   expect(await governor.state(proposalId)).to.eq(4) // succeeded
+  console.log('>> Proposal Succeeded')
 
   await governor.connect(proposer).queue(proposalId)
 
   expect(await governor.state(proposalId)).to.eq(5) // queued
-
+  console.log('>> Proposal Queued')
   await time.increase(86400 * 2)
 
   const txExecute = await governor.connect(proposer).execute(proposalId)
-
+  console.log('>> Proposal Executed')
   expect(await governor.state(proposalId)).to.eq(7) // executed
 
   return txExecute
 }
 
-async function proposeTx(governor: EmptySetGovernor, proposal: Proposal, signer: Signer) {
+async function proposeTx(governor: EmptySetGovernor | CompoundGovernor, proposal: Proposal, signer: Signer) {
   const params = proposal.clauses.map(clause => ethers.utils.defaultAbiCoder.encode(clause.argTypes, clause.argValues))
   return await governor.connect(signer).propose(
     proposal.clauses.map(({ to }) => to),

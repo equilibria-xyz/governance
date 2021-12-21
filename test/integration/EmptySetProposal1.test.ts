@@ -9,6 +9,8 @@ import {
   EmptySetProp1Initializer__factory,
   EmptySetShare__factory,
   UniswapV3Staker__factory,
+  EmptySetGovernor,
+  EmptySetGovernor__factory,
 } from '../../types/generated'
 import { govern, impersonate, time } from '../testutil'
 
@@ -24,6 +26,7 @@ describe('Empty Set Proposal 1', () => {
   let ess: EmptySetShare
   let staker: UniswapV3Staker
   let prop1Initializer: EmptySetProp1Initializer
+  let governor: EmptySetGovernor
 
   beforeEach(async () => {
     time.reset(HRE.config)
@@ -33,13 +36,12 @@ describe('Empty Set Proposal 1', () => {
     ess = EmptySetShare__factory.connect((await deployments.get('EmptySetShare')).address, funder)
     staker = UniswapV3Staker__factory.connect((await deployments.get('UniswapV3Staker')).address, funder)
     prop1Initializer = await new EmptySetProp1Initializer__factory(funder).deploy()
+    governor = await EmptySetGovernor__factory.connect((await deployments.get('EmptySetGovernor')).address, essSigner)
   })
 
   it('starts the initializers', async () => {
     const txExecute = await govern.propose(
-      (
-        await deployments.get('EmptySetGovernor')
-      ).address,
+      governor,
       (
         await deployments.get('EmptySetShare')
       ).address,
@@ -85,9 +87,7 @@ describe('Empty Set Proposal 1', () => {
     const reserveBalanceBefore = await ess.balanceOf(RESERVE_ADDRESS)
 
     await govern.propose(
-      (
-        await deployments.get('EmptySetGovernor')
-      ).address,
+      governor,
       (
         await deployments.get('EmptySetShare')
       ).address,

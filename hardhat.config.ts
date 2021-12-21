@@ -45,7 +45,7 @@ task('accounts', 'Prints the list of accounts', async (args, hre) => {
 function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig {
   const url = `https://${network}.infura.io/v3/${INFURA_API_KEY}`
   return {
-    accounts: [PRIVATE_KEY],
+    accounts: PRIVATE_KEY !== '' ? [PRIVATE_KEY] : [],
     chainId: chainIds[network],
     url,
   }
@@ -75,7 +75,7 @@ const config: HardhatUserConfig = {
     mainnet: {
       chainId: chainIds.mainnet,
       url: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_KEY}`,
-      accounts: [PRIVATE_KEY],
+      accounts: PRIVATE_KEY !== '' ? [PRIVATE_KEY] : [],
     },
   },
   solidity: {

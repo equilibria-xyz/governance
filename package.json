@@ -10,7 +10,7 @@
     "gasReport": "REPORT_GAS=true yarn test",
     "test": "hardhat test ./test/unit/*",
     "test-integration": "FORK_ENABLED=true hardhat test ./test/integration/*",
-    "lint": "eslint && solhint 'contracts/**/*.sol'",
+    "lint": "eslint --ext '.ts,.js' ./ && solhint 'contracts/**/*.sol'",
     "format": "prettier -w .",
     "postinstall": "yarn build",
     "prepare": "husky install",
@@ -56,9 +56,8 @@
   },
   "dependencies": {},
   "lint-staged": {
-    "*.ts": "eslint --cache --fix",
+    "*.{ts,.js}": "eslint --ext '.ts,.js' ./",
     "*.sol": "solhint 'contracts/**/*.sol' --fix",
-    "*.*": "prettier --write",
-    "*.js": "eslint --cache --fix"
+    "*.*": "prettier --write"
   }
 }
