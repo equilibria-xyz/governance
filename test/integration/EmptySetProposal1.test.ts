@@ -15,6 +15,7 @@ import {
 import { govern, impersonate, time } from '../testutil'
 
 const { ethers, deployments } = HRE
+const FORK_BLOCK = 13071489
 const ESS_ADDRESS = '0x07b991579b4e1Ee01d7a3342AF93E96ecC59E0B3'
 const RESERVE_ADDRESS = '0xD05aCe63789cCb35B9cE71d01e4d632a0486Da4B'
 const DSU_INCENTIVE_AMOUNT = ethers.utils.parseEther('8000000')
@@ -29,7 +30,7 @@ describe('Empty Set Proposal 1', () => {
   let governor: EmptySetGovernor
 
   beforeEach(async () => {
-    time.reset(HRE.config)
+    time.reset(HRE.config, FORK_BLOCK)
     ;[funder] = await ethers.getSigners()
     essSigner = await impersonate.impersonate(ESS_ADDRESS, funder)
 

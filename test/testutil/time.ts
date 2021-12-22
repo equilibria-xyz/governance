@@ -17,12 +17,12 @@ export async function increase(duration: number): Promise<void> {
   await advanceBlock()
 }
 
-export async function reset(config: HardhatConfig): Promise<void> {
+export async function reset(config: HardhatConfig, blockNumber = 0): Promise<void> {
   await ethers.provider.send('hardhat_reset', [
     {
       forking: {
         jsonRpcUrl: config.networks?.hardhat?.forking?.url,
-        blockNumber: config.networks?.hardhat?.forking?.blockNumber,
+        blockNumber: blockNumber || config.networks?.hardhat?.forking?.blockNumber,
       },
     },
   ])
