@@ -6,7 +6,6 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import {
   CompoundGovernor__factory,
   CompoundGovernor,
-  CErc20DelegateNew__factory,
   CErc20Delegator,
   CErc20Delegator__factory,
   CToken,
@@ -15,6 +14,7 @@ import {
 import { govern, impersonate, time } from '../testutil'
 
 const { ethers, deployments } = HRE
+const DEPLOYED_IMPL = '0xFcB924Ae46C7DDc6ad4F873a59ad6F3b5A2e20d5'
 const PROPOSER_ADDRESS = '0x8169522c2c57883e8ef80c498aab7820da539806'
 const CDAI_ADDRESS = '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643'
 const SUPPORTER_ADDRESSES = ['0x9aa835bc7b8ce13b9b0c9764a52fbf71ac62ccf1', '0x6626593c237f530d15ae9980a95ef938ac15c35c']
@@ -50,7 +50,6 @@ describe('Compound Proposal X', () => {
     // This will return an error (old impl)
     expect(await cdai.callStatic._setPendingAdmin(funder.address)).to.equal('1')
 
-    const impl = await new CErc20DelegateNew__factory(funder).deploy()
     await govern.propose(
       governor,
       (
@@ -63,7 +62,7 @@ describe('Compound Proposal X', () => {
             value: 0,
             method: '_setImplementation(address,bool,bytes)',
             argTypes: ['address', 'bool', 'bytes'],
-            argValues: [impl.address, true, '0x'],
+            argValues: [DEPLOYED_IMPL, true, '0x'],
           },
         ],
         description: 'Proposal',
@@ -73,7 +72,7 @@ describe('Compound Proposal X', () => {
       true,
     )
 
-    expect(await cerc20Delgator.implementation()).to.equal(impl.address)
+    expect(await cerc20Delgator.implementation()).to.equal(DEPLOYED_IMPL)
     expect(await cdai.totalSupply()).to.equal(prevTotalSupply)
     expect(await cdai.totalBorrows()).to.equal(prevTotalBorrows)
     expect(await cdai.totalReserves()).to.equal(prevTotalReserves)
