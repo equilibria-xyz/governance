@@ -19,6 +19,7 @@ const CDAI_ADDRESS = '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643'
 const CSUSHI_ADDRESS = '0x4b0181102a0112a2ef11abee5563bb4a3176c9d7'
 const SUPPORTER_ADDRESSES = ['0x9aa835bc7b8ce13b9b0c9764a52fbf71ac62ccf1', '0xea6C3Db2e7FCA00Ea9d7211a03e83f568Fc13BF7']
 const PROPOSAL_TEXT = `# Update cSUSHI cToken Implementation
+## Summary
 This proposal is a patch developed by Equilibria which updates the cToken implementation contract for cSUSHI to a more recent
 Solidity version (0.8.6) and removes error codes in favor of reverts with custom errors. No other core logic changes are
 intended. The new implementation has been deployed to [0xFcB924Ae46C7DDc6ad4F873a59ad6F3b5A2e20d5](https://etherscan.io/address/0xfcb924ae46c7ddc6ad4f873a59ad6f3b5a2e20d5)
@@ -38,9 +39,9 @@ More cTokens will be upgraded in a future proposal if this one passes and causes
 The code changes can be viewed here: [Pull Request #152](https://github.com/compound-finance/compound-protocol/pull/152).
 
 An audit was completed by the [ChainSecurity Team](https://chainsecurity.com/security-audit/compound-ctoken) and all issues
-were either fixed or out of scope for this change. For further discussion, please view the [Community Forum thread](https://www.comp.xyz/t/safety-and-gas-patches/1723).`
+were either fixed or out of scope for this change. For further discussion, please view the [Community Forum thread](https://www.comp.xyz/t/rfp12-implementation-ctoken-cleanup/2694).`
 
-describe.only('Compound Proposal X', () => {
+describe('Compound Proposal X', () => {
   let funder: SignerWithAddress
   let proposerSigner: Signer
   let supporterSigners: Signer[]
@@ -99,7 +100,7 @@ describe.only('Compound Proposal X', () => {
     await expect(ctoken.callStatic._setPendingAdmin(funder.address)).to.be.reverted
   }
 
-  it('upgrades cSUSHI', async () => {
+  it.only('upgrades cSUSHI', async () => {
     await testCTokenUpgrade(CSUSHI_ADDRESS)
   }).timeout(120000)
 
