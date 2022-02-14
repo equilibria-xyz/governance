@@ -40,7 +40,7 @@ The code changes can be viewed here: [Pull Request #152](https://github.com/comp
 An audit was completed by the [ChainSecurity Team](https://chainsecurity.com/security-audit/compound-ctoken) and all issues
 were either fixed or out of scope for this change. For further discussion, please view the [Community Forum thread](https://www.comp.xyz/t/safety-and-gas-patches/1723).`
 
-describe.only('Compound Proposal X', () => {
+describe('Compound Proposal X', () => {
   let funder: SignerWithAddress
   let proposerSigner: Signer
   let supporterSigners: Signer[]

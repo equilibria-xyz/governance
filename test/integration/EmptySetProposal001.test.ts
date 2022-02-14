@@ -21,7 +21,7 @@ const RESERVE_ADDRESS = '0xD05aCe63789cCb35B9cE71d01e4d632a0486Da4B'
 const DSU_INCENTIVE_AMOUNT = ethers.utils.parseEther('8000000')
 const ESS_INCENTIVE_AMOUNT = ethers.utils.parseEther('4000000')
 
-describe('Empty Set Proposal 1', () => {
+describe('Empty Set Proposal 001', () => {
   let funder: Signer
   let essSigner: Signer
   let ess: EmptySetShare
