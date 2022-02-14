@@ -9,10 +9,13 @@ import {
   EmptySetProp1Initializer__factory,
   EmptySetShare__factory,
   UniswapV3Staker__factory,
+  EmptySetGovernor,
+  EmptySetGovernor__factory,
 } from '../../types/generated'
 import { govern, impersonate, time } from '../testutil'
 
 const { ethers, deployments } = HRE
+const FORK_BLOCK = 13071489
 const ESS_ADDRESS = '0x07b991579b4e1Ee01d7a3342AF93E96ecC59E0B3'
 const RESERVE_ADDRESS = '0xD05aCe63789cCb35B9cE71d01e4d632a0486Da4B'
 const DSU_INCENTIVE_AMOUNT = ethers.utils.parseEther('8000000')
@@ -24,22 +27,22 @@ describe('Empty Set Proposal 1', () => {
   let ess: EmptySetShare
   let staker: UniswapV3Staker
   let prop1Initializer: EmptySetProp1Initializer
+  let governor: EmptySetGovernor
 
   beforeEach(async () => {
-    time.reset(HRE.config)
+    time.reset(HRE.config, FORK_BLOCK)
     ;[funder] = await ethers.getSigners()
     essSigner = await impersonate.impersonate(ESS_ADDRESS, funder)
 
     ess = EmptySetShare__factory.connect((await deployments.get('EmptySetShare')).address, funder)
     staker = UniswapV3Staker__factory.connect((await deployments.get('UniswapV3Staker')).address, funder)
     prop1Initializer = await new EmptySetProp1Initializer__factory(funder).deploy()
+    governor = await EmptySetGovernor__factory.connect((await deployments.get('EmptySetGovernor')).address, essSigner)
   })
 
   it('starts the initializers', async () => {
     const txExecute = await govern.propose(
-      (
-        await deployments.get('EmptySetGovernor')
-      ).address,
+      governor,
       (
         await deployments.get('EmptySetShare')
       ).address,
@@ -85,9 +88,7 @@ describe('Empty Set Proposal 1', () => {
     const reserveBalanceBefore = await ess.balanceOf(RESERVE_ADDRESS)
 
     await govern.propose(
-      (
-        await deployments.get('EmptySetGovernor')
-      ).address,
+      governor,
       (
         await deployments.get('EmptySetShare')
       ).address,
