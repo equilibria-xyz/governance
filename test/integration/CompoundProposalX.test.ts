@@ -49,8 +49,10 @@ describe('Compound Proposal X', () => {
   beforeEach(async () => {
     time.reset(HRE.config)
     ;[funder] = await ethers.getSigners()
-    proposerSigner = await impersonate.impersonate(PROPOSER_ADDRESS, funder)
-    supporterSigners = await Promise.all(SUPPORTER_ADDRESSES.map(s => impersonate.impersonate(s, funder)))
+    proposerSigner = await impersonate.impersonateWithBalance(PROPOSER_ADDRESS, ethers.utils.parseEther('10'))
+    supporterSigners = await Promise.all(
+      SUPPORTER_ADDRESSES.map(s => impersonate.impersonateWithBalance(s, ethers.utils.parseEther('10'))),
+    )
     governor = await CompoundGovernor__factory.connect(
       (
         await deployments.get('CompoundGovernor')

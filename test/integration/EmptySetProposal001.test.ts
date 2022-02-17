@@ -32,7 +32,7 @@ describe('Empty Set Proposal 001', () => {
   beforeEach(async () => {
     time.reset(HRE.config, FORK_BLOCK)
     ;[funder] = await ethers.getSigners()
-    essSigner = await impersonate.impersonate(ESS_ADDRESS, funder)
+    essSigner = await impersonate.impersonateWithBalance(ESS_ADDRESS, ethers.utils.parseEther('10'))
 
     ess = EmptySetShare__factory.connect((await deployments.get('EmptySetShare')).address, funder)
     staker = UniswapV3Staker__factory.connect((await deployments.get('UniswapV3Staker')).address, funder)

@@ -4,3 +4,4 @@ node_modules
 types/generated
 deployments
 .prettierignore
+yarn.lock
