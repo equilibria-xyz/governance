@@ -77,7 +77,7 @@ export async function propose(
   return txExecute
 }
 
-async function proposeTx(governor: EmptySetGovernor | CompoundGovernor, proposal: Proposal, signer: Signer) {
+export async function proposeTx(governor: EmptySetGovernor | CompoundGovernor, proposal: Proposal, signer: Signer) {
   const params = proposal.clauses.map(clause => ethers.utils.defaultAbiCoder.encode(clause.argTypes, clause.argValues))
   return await governor.connect(signer).propose(
     proposal.clauses.map(({ to }) => to),

@@ -3,7 +3,7 @@ import 'hardhat-deploy'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { DeployFunction } from 'hardhat-deploy/types'
 
-const deploy_ess001: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
+const deploy_es001: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, ethers } = hre
   const { deploy } = deployments
   const ds = await deployments.all()
@@ -16,5 +16,6 @@ const deploy_ess001: DeployFunction = async function (hre: HardhatRuntimeEnviron
   })
   console.log('EmptySetProp1Initializer deployed to: ', result.address)
 }
-export const tags = ['EmptySetProp1Initializer']
-export default deploy_ess001
+
+export default deploy_es001
+deploy_es001.tags = ['EmptySetProp1Initializer']
