@@ -16,7 +16,7 @@ import { govern, impersonate, time } from '../testutil'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 
 const { ethers, deployments } = HRE
-const FORK_BLOCK = 14218725
+const FORK_BLOCK = 14279760
 
 const USDC_ADDRESS = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
 const DSU_ADDRESS = '0x605D26FBd5be761089281d5cec2Ce86eeA667109'
@@ -24,14 +24,30 @@ const ESS_ADDRESS = '0x07b991579b4e1Ee01d7a3342AF93E96ecC59E0B3'
 const RESERVE_ADDRESS = '0xD05aCe63789cCb35B9cE71d01e4d632a0486Da4B'
 const PROXY_ADMIN_ADDRESS = '0x4d2A5E3b7831156f62C8dF47604E321cdAF35fec'
 const TIMELOCK_ADDRESS = '0x1bba92F379375387bf8F927058da14D47464cB7A'
-const NEW_RESERVE_ADDRESS = '' // TODO: after reserve implementation deploy
+const NEW_RESERVE_ADDRESS = '0xa3aA1b352711dd4aD4af1c555f873250b067e486'
 
 const WRAP_ONLY_BATCHER_ADDRESS = '0x0B663CeaCEF01f2f88EB7451C70Aa069f19dB997'
 const WRAP_ONLY_BATCHER_AMOUNT = ethers.utils.parseEther('1000000')
 
 const USDC_HOLDER_ADDRESS = '0xE78388b4CE79068e89Bf8aA7f218eF6b9AB0e9d0'
 
-const PROPOSAL_TEXT = `This a proposal` // TODO: complete
+const PROPOSAL_TEXT = `# Enabling Cheaper L1 / L2 Wrapping
+## Background
+Currently, wrapping and unwrapping USDC to and from DSU is gas cost prohibitive in the Empty Set protocol. These operations require performing a Compound mint or redeem internally so that no USDC sits idle in the Empty Set reserve contract. This ensures a trustless mechanism, however it comes at the expense of extremely high gas costs for these operations (approx. 250,000 - 275,000).
+
+#### L2 Extensibility
+In addition to the high gas costs on L1, there is no feasible way to wrap / unwrap directly on L2. Currently, DSU must be bridged to an L2 before it can be used there, making it less accessible and increasing its volatility around the peg.
+
+## Trusted Borrowing
+We propose adding a new feature to the Empty Set reserve called *Trusted Borrowing* which allows the Empty Set DAO to front DSU to programmatically-trusted contracts, which are able to ensure that they can repay the fronted DSU in full at all times.
+
+#### L1 Batcher
+The first of these trusted contracts would be a wrapping-only batcher contract. This is the lowest hanging fruit and doesn’t rely on a USDC buffer, but still grants a vastly cheaper onboarding experience into DSU.
+
+#### Resources
+- The Reserve update implementation can be seen [here](https://github.com/emptysetsquad/emptyset/pull/30).
+- The initial Batcher implementatino can be seen [here](https://github.com/equilibria-xyz/emptyset-batcher).
+- Further discussion [here](https://www.emptyset.xyz/t/enabling-cheaper-l1-l2-wrapping/307).`
 
 const DSU_AMOUNT = ethers.utils.parseEther('1000000')
 const USDC_AMOUNT = 1000000_000_000
@@ -62,7 +78,8 @@ describe.only('Empty Set Proposal 002', () => {
 
     dsu = IERC20__factory.connect(DSU_ADDRESS, funder)
     usdc = IERC20__factory.connect(USDC_ADDRESS, funder)
-    reserveImpl2 = await new ReserveImpl2__factory(funder).deploy()
+    // reserveImpl2 = await new ReserveImpl2__factory(funder).deploy()
+    reserveImpl2 = await new ReserveImpl2__factory(funder).attach(NEW_RESERVE_ADDRESS)
     reserve = ReserveImpl2__factory.connect(RESERVE_ADDRESS, funder)
 
     await govern.propose(
