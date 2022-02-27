@@ -28,7 +28,7 @@ const WRAP_ONLY_BATCHER_ADDRESS = '0x0B663CeaCEF01f2f88EB7451C70Aa069f19dB997'
 const DSU_AMOUNT = ethers.utils.parseEther('1000000')
 const USDC_AMOUNT = 1000000_000_000
 
-describe.only('Empty Set Proposal 002', () => {
+describe('Empty Set Proposal 002', () => {
   let funder: SignerWithAddress
   let user: SignerWithAddress
   let timelockSigner: SignerWithAddress
