@@ -1,11 +1,12 @@
-import { Signer } from 'ethers'
+import { BigNumber, BigNumberish } from 'ethers'
 import HRE from 'hardhat'
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 const { ethers } = HRE
 
-export async function impersonate(address: string, funder: Signer): Promise<Signer> {
-  await funder.sendTransaction({
-    to: address,
-    value: ethers.utils.parseEther('1'),
+export async function impersonateWithBalance(address: string, balance: BigNumberish): Promise<SignerWithAddress> {
+  await HRE.network.provider.request({
+    method: 'hardhat_setBalance',
+    params: [address, BigNumber.from(balance).toHexString()],
   })
   await HRE.network.provider.request({
     method: 'hardhat_impersonateAccount',

@@ -21,7 +21,7 @@ const RESERVE_ADDRESS = '0xD05aCe63789cCb35B9cE71d01e4d632a0486Da4B'
 const DSU_INCENTIVE_AMOUNT = ethers.utils.parseEther('8000000')
 const ESS_INCENTIVE_AMOUNT = ethers.utils.parseEther('4000000')
 
-describe('Empty Set Proposal 1', () => {
+describe('Empty Set Proposal 001', () => {
   let funder: Signer
   let essSigner: Signer
   let ess: EmptySetShare
@@ -32,7 +32,7 @@ describe('Empty Set Proposal 1', () => {
   beforeEach(async () => {
     time.reset(HRE.config, FORK_BLOCK)
     ;[funder] = await ethers.getSigners()
-    essSigner = await impersonate.impersonate(ESS_ADDRESS, funder)
+    essSigner = await impersonate.impersonateWithBalance(ESS_ADDRESS, ethers.utils.parseEther('10'))
 
     ess = EmptySetShare__factory.connect((await deployments.get('EmptySetShare')).address, funder)
     staker = UniswapV3Staker__factory.connect((await deployments.get('UniswapV3Staker')).address, funder)

@@ -25,14 +25,15 @@ export async function propose(
   proposer: Signer,
   supporters: Signer[] = [],
   compoundGovernor = false,
+  verbose = true,
 ): Promise<ContractTransaction> {
-  console.log('>> Starting Proposal Flow')
+  verbose && console.log('>> Starting Proposal Flow')
   const token: COMP = COMP__factory.connect(tokenAddress, proposer)
   const votingPower = await token.getCurrentVotes(await proposer.getAddress())
 
   await proposeTx(governor, proposal, proposer)
   const proposalId = await governor.proposalCount()
-  console.log('>> TX Proposed')
+  verbose && console.log('>> TX Proposed')
 
   expect(await governor.proposalCount()).to.eq(proposalId)
   expect(await governor.state(proposalId)).to.eq(0)
@@ -42,7 +43,7 @@ export async function propose(
   await time.advanceBlockTo(currBlock + votingDelay.toNumber() + 1)
 
   expect(await governor.state(proposalId)).to.eq(1)
-  console.log('>> Proposal Active')
+  verbose && console.log('>> Proposal Active')
 
   if (compoundGovernor) {
     await (governor.connect(proposer) as CompoundGovernor).castVote(proposalId, 1)
@@ -51,7 +52,7 @@ export async function propose(
     await (governor.connect(proposer) as EmptySetGovernor).castVote(proposalId, true)
     await Promise.all(supporters.map(async s => (governor.connect(s) as EmptySetGovernor).castVote(proposalId, true)))
   }
-  console.log('>> Votes Cast')
+  verbose && console.log('>> Votes Cast')
 
   const receipt = await governor.getReceipt(proposalId, await proposer.getAddress())
   expect(receipt.hasVoted).to.eq(true)
@@ -61,22 +62,22 @@ export async function propose(
   const endBlock = (await governor.proposals(proposalId)).endBlock
   await time.advanceBlockTo(endBlock.toNumber() + 1)
   expect(await governor.state(proposalId)).to.eq(4) // succeeded
-  console.log('>> Proposal Succeeded')
+  verbose && console.log('>> Proposal Succeeded')
 
   await governor.connect(proposer).queue(proposalId)
 
   expect(await governor.state(proposalId)).to.eq(5) // queued
-  console.log('>> Proposal Queued')
+  verbose && console.log('>> Proposal Queued')
   await time.increase(86400 * 2)
 
   const txExecute = await governor.connect(proposer).execute(proposalId)
-  console.log('>> Proposal Executed')
+  verbose && console.log('>> Proposal Executed')
   expect(await governor.state(proposalId)).to.eq(7) // executed
 
   return txExecute
 }
 
-async function proposeTx(governor: EmptySetGovernor | CompoundGovernor, proposal: Proposal, signer: Signer) {
+export async function proposeTx(governor: EmptySetGovernor | CompoundGovernor, proposal: Proposal, signer: Signer) {
   const params = proposal.clauses.map(clause => ethers.utils.defaultAbiCoder.encode(clause.argTypes, clause.argValues))
   console.log(`>>>> Calldatas: ${params}`)
   return await governor.connect(signer).propose(
