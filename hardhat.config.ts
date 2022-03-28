@@ -64,7 +64,6 @@ const config: HardhatUserConfig = {
       forking: {
         url: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_KEY}`,
         enabled: FORK_ENABLED,
-        blockNumber: 13935796,
       },
       chainId: chainIds.hardhat,
     },
@@ -80,6 +79,9 @@ const config: HardhatUserConfig = {
   },
   solidity: {
     compilers: [
+      {
+        version: '0.8.10',
+      },
       {
         version: '0.8.6',
       },

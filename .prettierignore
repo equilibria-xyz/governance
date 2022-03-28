@@ -5,3 +5,4 @@ types/generated
 deployments
 .prettierignore
 yarn.lock
+.tool-versions
