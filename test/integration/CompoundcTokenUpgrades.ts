@@ -21,7 +21,7 @@ const SUPPORTER_ADDRESSES = ['0x9aa835bc7b8ce13b9b0c9764a52fbf71ac62ccf1', '0xea
 const FORK_BLOCK = 14476802
 const USE_REAL_DEPLOY = true
 
-describe.only('Compound Proposal X', () => {
+describe('Compound Proposal X', () => {
   let funder: SignerWithAddress
   let proposerSigner: Signer
   let supporterSigners: Signer[]
