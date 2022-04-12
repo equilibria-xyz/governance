@@ -13,6 +13,7 @@ import {
 } from '../../types/generated'
 import { govern, impersonate, time } from '../testutil'
 import { COMP_096 } from '../../proposals/compound/comp096'
+import { COMP_100 } from '../../proposals/compound/comp100'
 
 const { ethers, deployments } = HRE
 const PROPOSER_ADDRESS = '0x589CDCf60aea6B961720214e80b713eB66B89A4d' // Equilibria Multisig
@@ -21,7 +22,7 @@ const SUPPORTER_ADDRESSES = ['0x9aa835bc7b8ce13b9b0c9764a52fbf71ac62ccf1', '0xea
 const FORK_BLOCK = 14476802
 const USE_REAL_DEPLOY = true
 
-describe('Compound Proposal X', () => {
+describe('Compound cToken Upgrades', () => {
   let funder: SignerWithAddress
   let proposerSigner: Signer
   let supporterSigners: Signer[]
@@ -55,9 +56,7 @@ describe('Compound Proposal X', () => {
       : await new CErc20DelegateNew__factory(funder).deploy()
   })
 
-  it('performs Compound 96 Proposal', async () => {
-    const { proposal, ctokens } = COMP_096(newDelegate.address)
-
+  async function testProposal(proposal: govern.Proposal, ctokens: string[]) {
     const before = await Promise.all(
       ctokens.map(async ctokenAddress => {
         const cerc20Delegator = await CErc20Delegator__factory.connect(ctokenAddress, funder)
@@ -99,5 +98,15 @@ describe('Compound Proposal X', () => {
         return true
       }),
     )
+  }
+
+  it('performs Compound 96 Proposal', async () => {
+    const { proposal, ctokens } = COMP_096(newDelegate.address)
+    await testProposal(proposal, ctokens)
+  }).timeout(600000)
+
+  it('performs Compound 100 Proposal', async () => {
+    const { proposal, ctokens } = COMP_100(newDelegate.address)
+    await testProposal(proposal, ctokens)
   }).timeout(600000)
 })
