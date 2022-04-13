@@ -19,10 +19,10 @@ const { ethers, deployments } = HRE
 const PROPOSER_ADDRESS = '0x589CDCf60aea6B961720214e80b713eB66B89A4d' // Equilibria Multisig
 const SUPPORTER_ADDRESSES = ['0x9aa835bc7b8ce13b9b0c9764a52fbf71ac62ccf1', '0xea6C3Db2e7FCA00Ea9d7211a03e83f568Fc13BF7']
 
-const FORK_BLOCK = 14476802
 const USE_REAL_DEPLOY = true
 
 describe('Compound cToken Upgrades', () => {
+  let forkBlock: number
   let funder: SignerWithAddress
   let proposerSigner: Signer
   let supporterSigners: Signer[]
@@ -38,9 +38,11 @@ describe('Compound cToken Upgrades', () => {
   })
 
   beforeEach(async () => {
-    time.reset(HRE.config, FORK_BLOCK)
-    ;[funder] = await ethers.getSigners()
+    console.log(`Forking at block ${forkBlock}`)
+    await time.reset(HRE.config, forkBlock)
+
     proposerSigner = await impersonate.impersonateWithBalance(PROPOSER_ADDRESS, ethers.utils.parseEther('10'))
+    ;[funder] = await ethers.getSigners()
     supporterSigners = await Promise.all(
       SUPPORTER_ADDRESSES.map(s => impersonate.impersonateWithBalance(s, ethers.utils.parseEther('10'))),
     )
@@ -100,13 +102,24 @@ describe('Compound cToken Upgrades', () => {
     )
   }
 
-  it('performs Compound 96 Proposal', async () => {
-    const { proposal, ctokens } = COMP_096(newDelegate.address)
-    await testProposal(proposal, ctokens)
-  }).timeout(600000)
+  describe('COMP096', () => {
+    before(async () => {
+      forkBlock = 14476802
+    })
+    it('performs Compound 96 Proposal', async () => {
+      const { proposal, ctokens } = COMP_096(newDelegate.address)
+      await testProposal(proposal, ctokens)
+    }).timeout(600000)
+  })
 
-  it('performs Compound 100 Proposal', async () => {
-    const { proposal, ctokens } = COMP_100(newDelegate.address)
-    await testProposal(proposal, ctokens)
-  }).timeout(600000)
+  describe('COMP100', () => {
+    before(async () => {
+      forkBlock = 14579191
+    })
+
+    it('performs Compound 100 Proposal', async () => {
+      const { proposal, ctokens } = COMP_100(newDelegate.address)
+      await testProposal(proposal, ctokens)
+    }).timeout(600000)
+  })
 })
