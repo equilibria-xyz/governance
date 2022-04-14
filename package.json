@@ -9,7 +9,7 @@
     "compile": "hardhat compile",
     "gasReport": "REPORT_GAS=true yarn test",
     "test": "hardhat test ./test/unit/*",
-    "test-integration": "FORK_ENABLED=true hardhat test test/integration/*",
+    "test:integration": "FORK_ENABLED=true hardhat test test/integration/*",
     "lint": "eslint --ext '.ts,.js' ./ && solhint 'contracts/**/*.sol'",
     "format": "prettier -w .",
     "postinstall": "yarn build",
