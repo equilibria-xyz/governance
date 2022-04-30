@@ -32,9 +32,6 @@ describe('Compound cToken Upgrades', () => {
   let governor: CompoundGovernor
   let newDelegate: CErc20DelegateNew
 
-  let COMP: IERC20
-  let USDC: IERC20
-
   before(async () => {
     if (USE_REAL_DEPLOY) {
       console.log(`Using cERC20Delegate impl deployed at ${(await deployments.get('CErc20Delegate')).address}`)
@@ -62,9 +59,6 @@ describe('Compound cToken Upgrades', () => {
     newDelegate = USE_REAL_DEPLOY
       ? await CErc20DelegateNew__factory.connect((await deployments.get('CErc20Delegate')).address, funder)
       : await new CErc20DelegateNew__factory(funder).deploy()
-
-    COMP = await IERC20__factory.connect('0xc00e94Cb662C3520282E6f5717214004A7f26888', funder)
-    USDC = await IERC20__factory.connect('0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', funder)
   })
 
   async function testProposal(proposal: govern.Proposal, ctokens: string[]) {
@@ -138,6 +132,9 @@ describe('Compound cToken Upgrades', () => {
     })
 
     it('performs Compound 104 Proposal', async () => {
+      const COMP = await IERC20__factory.connect('0xc00e94Cb662C3520282E6f5717214004A7f26888', funder)
+      const USDC = await IERC20__factory.connect('0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', funder)
+
       const { proposal, ctokens } = COMP_104(newDelegate.address)
       const eqCOMPBalanceBefore = await COMP.balanceOf(PROPOSER_ADDRESS)
       const clabsUSDCBalanceBefore = await USDC.balanceOf('0xe8F0c9059b8Db5B863d48dB8e8C1A09f97D3B991')
