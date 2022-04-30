@@ -104,7 +104,11 @@ const config: HardhatUserConfig = {
   typechain: {
     outDir: 'types/generated',
     target: 'ethers-v5',
-    externalArtifacts: ['external/contracts/*.json', 'external/deployments/**/*.json'],
+    externalArtifacts: [
+      'external/contracts/*.json',
+      'external/deployments/**/*.json',
+      '@openzeppelin/contracts/token/ERC20/IERC20.sol',
+    ],
   },
   external: {
     contracts: [{ artifacts: 'external/contracts' }],

@@ -4,11 +4,11 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { DeployFunction } from 'hardhat-deploy/types'
 import { govern } from '../test/testutil'
 import { CompoundGovernor__factory } from '../types/generated'
-import { COMP_100 } from '../proposals/compound/comp100'
+import { COMP_101 } from '../proposals/compound/comp101'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { providers } from 'ethers'
 
-const deploy_comp100: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
+const deploy_comp101: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const provider = new WalletConnectProvider({
     rpc: {
       1: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`,
@@ -34,9 +34,9 @@ const deploy_comp100: DeployFunction = async function (hre: HardhatRuntimeEnviro
     deployer,
   )
   const cerc20delegate = await deployments.get('CErc20Delegate')
-  await govern.proposeTx(governor, COMP_100(cerc20delegate.address).proposal, deployer)
-  console.log('proposed COMP100!')
+  await govern.proposeTx(governor, COMP_101(cerc20delegate.address).proposal, deployer)
+  console.log('proposed COMP101!')
 }
 
-export default deploy_comp100
-deploy_comp100.tags = ['COMP100']
+export default deploy_comp101
+deploy_comp101.tags = ['COMP101']

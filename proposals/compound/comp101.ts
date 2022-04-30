@@ -21,7 +21,7 @@ The code changes can be viewed here: [Pull Request #152](https://github.com/comp
 
 Audits of these changes were completed by ChainSecurity and OpenZeppelin and all issues were either fixed or out of scope for this change. For further discussion, please view the [Community Forum thread](https://www.comp.xyz/t/rfp12-implementation-ctoken-cleanup/2694).`
 
-export const COMP_100 = (implAddress: string): { proposal: Proposal; ctokens: string[] } => {
+export const COMP_101 = (implAddress: string): { proposal: Proposal; ctokens: string[] } => {
   const ctokens = [
     COMPOUND_CONTRACTS.CMKR_ADDRESS,
     COMPOUND_CONTRACTS.CLINK_ADDRESS,
