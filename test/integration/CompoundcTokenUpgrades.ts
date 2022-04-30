@@ -1,6 +1,6 @@
 import HRE from 'hardhat'
 import { expect } from 'chai'
-import { Signer } from 'ethers'
+import { Signer, utils } from 'ethers'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 
 import {
@@ -10,10 +10,13 @@ import {
   CToken__factory,
   CErc20DelegateNew,
   CErc20DelegateNew__factory,
+  IERC20,
+  IERC20__factory,
 } from '../../types/generated'
 import { govern, impersonate, time } from '../testutil'
 import { COMP_096 } from '../../proposals/compound/comp096'
-import { COMP_100 } from '../../proposals/compound/comp100'
+import { COMP_101 } from '../../proposals/compound/comp101'
+import { COMP_104 } from '../../proposals/compound/comp104'
 
 const { ethers, deployments } = HRE
 const PROPOSER_ADDRESS = '0x589CDCf60aea6B961720214e80b713eB66B89A4d' // Equilibria Multisig
@@ -112,14 +115,39 @@ describe('Compound cToken Upgrades', () => {
     }).timeout(600000)
   })
 
-  describe('COMP100', () => {
+  describe('COMP101', () => {
     before(async () => {
       forkBlock = 14579191
     })
 
-    it('performs Compound 100 Proposal', async () => {
-      const { proposal, ctokens } = COMP_100(newDelegate.address)
+    it('performs Compound 101 Proposal', async () => {
+      const { proposal, ctokens } = COMP_101(newDelegate.address)
       await testProposal(proposal, ctokens)
+    }).timeout(600000)
+  })
+
+  describe('COMP104', () => {
+    before(async () => {
+      forkBlock = 14683075
+    })
+
+    it('performs Compound 104 Proposal', async () => {
+      const COMP = await IERC20__factory.connect('0xc00e94Cb662C3520282E6f5717214004A7f26888', funder)
+      const USDC = await IERC20__factory.connect('0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', funder)
+
+      const { proposal, ctokens } = COMP_104(newDelegate.address)
+      const eqCOMPBalanceBefore = await COMP.balanceOf(PROPOSER_ADDRESS)
+      const clabsUSDCBalanceBefore = await USDC.balanceOf('0xe8F0c9059b8Db5B863d48dB8e8C1A09f97D3B991')
+
+      await testProposal(proposal, ctokens)
+
+      const eqCOMPBalanceAfter = await COMP.balanceOf(PROPOSER_ADDRESS)
+      const clabsUSDCBalanceAfter = await USDC.balanceOf('0xe8F0c9059b8Db5B863d48dB8e8C1A09f97D3B991')
+
+      expect(eqCOMPBalanceAfter.sub(eqCOMPBalanceBefore)).to.equal(utils.parseEther('3070.1754385965'))
+      console.log('Verified Equilibria COMP Grant')
+      expect(clabsUSDCBalanceAfter.sub(clabsUSDCBalanceBefore)).to.equal(79764.36e6)
+      console.log('Verified Compound Labs USDC Repayment')
     }).timeout(600000)
   })
 })
