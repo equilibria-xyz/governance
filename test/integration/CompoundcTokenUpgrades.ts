@@ -132,7 +132,7 @@ describe('Compound cToken Upgrades', () => {
     }).timeout(600000)
   })
 
-  describe.only('COMP104', () => {
+  describe('COMP104', () => {
     before(async () => {
       forkBlock = 14683075
     })
