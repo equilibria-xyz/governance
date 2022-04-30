@@ -6,9 +6,9 @@ const PROPOSAL_TEXT = `# Update High-TVL cToken Implementations
 ## Summary
 This proposal is a patch developed by Equilibria which updates the cToken implementation contract for high TVL assets. The new implementation has been deployed to [0x3363BAe2Fc44dA742Df13CD3ee94b6bB868ea376](https://etherscan.io/address/0x3363bae2fc44da742df13cd3ee94b6bb868ea376).
 
-This is the final proposal to bring all upgradeable cTokens up to the new implementation. In addition to updating the implementation, it grants $350,000[1] worth of COMP Equilibria and 79,764.36 USDC to Compound Labs for the ChainSecrity audit of the protocol[2].
+This is the final proposal to bring all upgradeable cTokens up to the new implementation. In addition to updating the implementation, it grants $350,000[1] worth of COMP to Equilibria for the upgrade work and 79,764.36 USDC to Compound Labs for the ChainSecrity audit of the protocol[2].
 
-[1] COMP value based on the current spot price at time of this proposal ($116)
+[1] COMP value based on the current spot price at time of this proposal ($114)
 [2] ChainSecurity Payment Transaction can be viewed [here](https://etherscan.io/tx/0x8aa026292f1bc869a1353b66d47673dbcf23cab2980e0d293fa3c7474caf17d0)
 
 ## Changelog
@@ -46,7 +46,7 @@ export const COMP_104 = (implAddress: string): { proposal: Proposal; ctokens: st
           value: 0,
           method: '_grantComp(address,uint256)',
           argTypes: ['address', 'uint256'],
-          argValues: [EQUILIBRIA_MULTISIG, ethers.utils.parseEther('3017.2413793103')],
+          argValues: [EQUILIBRIA_MULTISIG, ethers.utils.parseEther('3070.1754385965')],
         },
         // Compound Payment
         {

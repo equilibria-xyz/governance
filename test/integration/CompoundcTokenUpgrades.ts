@@ -147,7 +147,7 @@ describe('Compound cToken Upgrades', () => {
       const eqCOMPBalanceAfter = await COMP.balanceOf(PROPOSER_ADDRESS)
       const clabsUSDCBalanceAfter = await USDC.balanceOf('0xe8F0c9059b8Db5B863d48dB8e8C1A09f97D3B991')
 
-      expect(eqCOMPBalanceAfter.sub(eqCOMPBalanceBefore)).to.equal(utils.parseEther('3017.2413793103'))
+      expect(eqCOMPBalanceAfter.sub(eqCOMPBalanceBefore)).to.equal(utils.parseEther('3070.1754385965'))
       console.log('Verified Equilibria COMP Grant')
       expect(clabsUSDCBalanceAfter.sub(clabsUSDCBalanceBefore)).to.equal(79764.36e6)
       console.log('Verified Compound Labs USDC Repayment')
