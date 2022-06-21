@@ -23,7 +23,7 @@ const PROPOSER_ADDRESS = '0x589CDCf60aea6B961720214e80b713eB66B89A4d' // Equilib
 const USE_REAL_DEPLOY = false
 const FORK_BLOCK = 14994972
 
-describe.only('Empty Set Proposal 003', () => {
+describe('Empty Set Proposal 003', () => {
   let funder: SignerWithAddress
   let proposerSigner: Signer
   let multisigSigner: Signer
@@ -91,6 +91,11 @@ describe.only('Empty Set Proposal 003', () => {
     expect(await newGovernorAlpha.timelock()).to.equal((await deployments.get('EmptySetTimelock')).address)
     expect(await newGovernorAlpha.stake()).to.equal((await deployments.get('EmptySetShare')).address)
     expect(await newGovernorAlpha.guardian()).to.equal(EMPTYSET_CONTRACTS.GUARDIAN)
+
+    expect(await newGovernorAlpha.proposalThreshold()).to.equal(ethers.utils.parseEther('40000000'))
+    expect(await newGovernorAlpha.quorumVotes()).to.equal(ethers.utils.parseEther('200000000'))
+    expect(await newGovernorAlpha.votingDelay()).to.equal(13292)
+    expect(await newGovernorAlpha.votingPeriod()).to.equal(46523)
   })
 
   context('guardian', () => {

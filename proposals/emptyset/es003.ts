@@ -2,23 +2,37 @@ import { ethers } from 'ethers'
 import { EMPTYSET_CONTRACTS } from './contracts'
 import { Proposal } from '../../test/testutil/govern'
 
-const PROPOSAL_TEXT = `# Enabling Cheaper L1 / L2 Wrapping
-## Background
-Currently, wrapping and unwrapping USDC to and from DSU is gas cost prohibitive in the Empty Set protocol. These operations require performing a Compound mint or redeem internally so that no USDC sits idle in the Empty Set reserve contract. This ensures a trustless mechanism, however it comes at the expense of extremely high gas costs for these operations (approx. 250,000 - 275,000).
+const PROPOSAL_TEXT = `# Update Governance Parameters
 
-#### L2 Extensibility
-In addition to the high gas costs on L1, there is no feasible way to wrap / unwrap directly on L2. Currently, DSU must be bridged to an L2 before it can be used there, making it less accessible and increasing its volatility around the peg.
+## Authors
 
-## Trusted Borrowing
-We propose adding a new feature to the Empty Set reserve called *Trusted Borrowing* which allows the Empty Set DAO to front DSU to programmatically-trusted contracts, which are able to ensure that they can repay the fronted DSU in full at all times.
+@kbrizzle (Equilibria), @lewi (S#2)
 
-#### L1 Batcher
-The first of these trusted contracts would be a wrapping-only batcher contract. This is the lowest hanging fruit and doesn’t rely on a USDC buffer, but still grants a vastly cheaper onboarding experience into DSU.
+### Background
 
-#### Resources
-- The Reserve update implementation can be seen [here](https://github.com/emptysetsquad/emptyset/pull/30).
-- The initial Batcher implementatino can be seen [here](https://github.com/equilibria-xyz/emptyset-batcher).
-- Further discussion [here](https://www.emptyset.xyz/t/enabling-cheaper-l1-l2-wrapping/307).`
+Currently, the Empty Set protocol is governed using a fork of Compound’s original GovernorAlpha contract.
+
+This contract is not upgradable, however a new instance may be deployed with updated hardcoded parameters, then switched over to through governance.
+
+### Motivation
+As protocols start to implement DSU as a unit of account, ensuring the sound governance of the protocol managing DSU is imperative. Given the current value of the governance token, we feel it prudent to raise the quorum & proposal requirements. Similarly, we feel that we should extend the voting periods due to incidents that have occured in the last few months.
+
+We intend to make it significantly harder to attack the Empty Set protocol via a malicious governance action through the implementation of these changes.
+
+### Overview
+We propose using the current audited GovernorAlpha contract but adjusting the hard-coded values to the ones below.
+
+#### Proposed parameters
+
+*Quorum:* Increase from 5.0% to 10.0%
+*Proposal:* Increase from 0.5% to 2.0%
+*Voting Delay:* Increase from 1 block to 2 days
+*Voting Period:* Increase from 3 days to 7 days
+*Timelock:* Remain at 2 days
+
+#### Implementation
+An initial implementation of the change can be viewed [here](https://github.com/emptysetsquad/emptyset/pull/31).
+`
 
 export const ES_003 = (newGovernorAddress: string): Proposal => {
   return {
