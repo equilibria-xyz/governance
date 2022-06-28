@@ -1,21 +1,17 @@
-import { ethers } from 'ethers'
 import { EMPTYSET_CONTRACTS } from './contracts'
 import { Proposal } from '../../test/testutil/govern'
 
+export const NEW_GOVERNOR_ALPHA_ADDRESS = '0x47C61a54B1d24d571F07a79d54543231292f769b'
+
 const PROPOSAL_TEXT = `# Update Governance Parameters
 
-## Authors
-
-@kbrizzle (Equilibria), @lewi (S#2)
-
 ### Background
-
 Currently, the Empty Set protocol is governed using a fork of Compound’s original GovernorAlpha contract.
 
 This contract is not upgradable, however a new instance may be deployed with updated hardcoded parameters, then switched over to through governance.
 
 ### Motivation
-As protocols start to implement DSU as a unit of account, ensuring the sound governance of the protocol managing DSU is imperative. Given the current value of the governance token, we feel it prudent to raise the quorum & proposal requirements. Similarly, we feel that we should extend the voting periods due to incidents that have occured in the last few months.
+As protocols start to implement DSU as a unit of account, ensuring the sound governance of the protocol managing DSU is imperative. Given the current value of the governance token, we feel it prudent to raise the quorum & proposal requirements. Similarly, we feel that we should extend the voting periods due to various attacks on other protocols that have occured in the last few months.
 
 We intend to make it significantly harder to attack the Empty Set protocol via a malicious governance action through the implementation of these changes.
 
@@ -30,11 +26,16 @@ We propose using the current audited GovernorAlpha contract but adjusting the ha
 *Voting Period:* Increase from 3 days to 7 days
 *Timelock:* Remain at 2 days
 
-#### Implementation
-An initial implementation of the change can be viewed [here](https://github.com/emptysetsquad/emptyset/pull/31).
+#### Operation
+Due to the GovernorAlpha guardian pattern, in order to fully enable the new governor, the Empty Set treasury multisig will need to execute one final \`__acceptAdmin()\` transaction call after the onchain proposal is executed. The passing of this proposal will thereby give this treasury multisig the authority to do so.
+
+#### Resources
+- The implementation of the new GovernorAlpha can be viewed [here](https://github.com/emptysetsquad/emptyset/pull/31).
+- Further discussion [here](https://www.emptyset.xyz/t/update-governance-parameters/342).\`
+
 `
 
-export const ES_003 = (newGovernorAddress: string): Proposal => {
+export const ES_003 = (newGovernorAddress: string = NEW_GOVERNOR_ALPHA_ADDRESS): Proposal => {
   return {
     clauses: [
       {

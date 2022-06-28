@@ -15,15 +15,15 @@ import {
 } from '../../types/generated'
 import { govern, impersonate, time } from '../testutil'
 import { EMPTYSET_CONTRACTS } from '../../proposals/emptyset/contracts'
-import { ES_003 } from '../../proposals/emptyset/es003'
+import { ES_003, NEW_GOVERNOR_ALPHA_ADDRESS } from '../../proposals/emptyset/es003'
 
 const { ethers, deployments } = HRE
 const PROPOSER_ADDRESS = '0x589CDCf60aea6B961720214e80b713eB66B89A4d' // Equilibria Multisig
 
-const USE_REAL_DEPLOY = false
-const FORK_BLOCK = 14994972
+const USE_REAL_DEPLOY = true
+const FORK_BLOCK = 15038185
 
-describe('Empty Set Proposal 003', () => {
+describe.only('Empty Set Proposal 003', () => {
   let funder: SignerWithAddress
   let proposerSigner: Signer
   let multisigSigner: Signer
@@ -34,7 +34,7 @@ describe('Empty Set Proposal 003', () => {
 
   before(async () => {
     if (USE_REAL_DEPLOY) {
-      console.log(`Using EmptySetGovernor2 impl deployed at ${(await deployments.get('EmptySetGovernor2')).address}`)
+      console.log(`Using EmptySetGovernor2 impl deployed at ${NEW_GOVERNOR_ALPHA_ADDRESS}`)
     } else {
       console.log('Deploying a new EmptySetGovernor2 implementation')
     }
@@ -57,7 +57,7 @@ describe('Empty Set Proposal 003', () => {
       proposerSigner,
     )
     newGovernorAlpha = USE_REAL_DEPLOY
-      ? await GovernorAlpha2__factory.connect((await deployments.get('EmptySetGovernor2')).address, funder)
+      ? await GovernorAlpha2__factory.connect(NEW_GOVERNOR_ALPHA_ADDRESS, funder)
       : await new GovernorAlpha2__factory(funder).deploy(
           (
             await deployments.get('EmptySetTimelock')
