@@ -23,7 +23,7 @@ const PROPOSER_ADDRESS = '0x589CDCf60aea6B961720214e80b713eB66B89A4d' // Equilib
 const USE_REAL_DEPLOY = true
 const FORK_BLOCK = 15038185
 
-describe.only('Empty Set Proposal 003', () => {
+describe('Empty Set Proposal 003', () => {
   let funder: SignerWithAddress
   let proposerSigner: Signer
   let multisigSigner: Signer
