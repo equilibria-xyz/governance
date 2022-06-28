@@ -31,7 +31,7 @@ export async function propose(
   const token: COMP = COMP__factory.connect(tokenAddress, proposer)
   const votingPower = await token.getCurrentVotes(await proposer.getAddress())
 
-  await proposeTx(governor, proposal, proposer)
+  await proposeTx(governor, proposal, proposer, verbose)
   const proposalId = await governor.proposalCount()
   verbose && console.log('>> TX Proposed')
 
@@ -77,9 +77,14 @@ export async function propose(
   return txExecute
 }
 
-export async function proposeTx(governor: EmptySetGovernor | CompoundGovernor, proposal: Proposal, signer: Signer) {
+export async function proposeTx(
+  governor: EmptySetGovernor | CompoundGovernor,
+  proposal: Proposal,
+  signer: Signer,
+  verbose = true,
+) {
   const params = proposal.clauses.map(clause => ethers.utils.defaultAbiCoder.encode(clause.argTypes, clause.argValues))
-  console.log(`>>>> Calldatas: ${params}`)
+  verbose && console.log(`>>>> Calldatas: ${params}`)
   return await governor.connect(signer).propose(
     proposal.clauses.map(({ to }) => to),
     proposal.clauses.map(({ value }) => value),
