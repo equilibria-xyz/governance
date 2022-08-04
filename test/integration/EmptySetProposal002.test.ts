@@ -46,16 +46,21 @@ describe('Empty Set Proposal 002', () => {
   beforeEach(async () => {
     time.reset(HRE.config, FORK_BLOCK)
     ;[funder, user] = await ethers.getSigners()
-    essSigner = await impersonate.impersonateWithBalance(EMPTYSET_CONTRACTS.ESS_ADDRESS, ethers.utils.parseEther('10'))
+    essSigner = await impersonate.impersonateWithBalance(
+      EMPTYSET_CONTRACTS.ESS_HOLDER_ADDRESS,
+      ethers.utils.parseEther('10'),
+    )
     timelockSigner = await impersonate.impersonateWithBalance(
-      EMPTYSET_CONTRACTS.TIMELOCK_ADDRESS,
+      (
+        await deployments.get('EmptySetTimelock')
+      ).address,
       ethers.utils.parseEther('10'),
     )
 
     governor = await EmptySetGovernor__factory.connect((await deployments.get('EmptySetGovernor')).address, funder)
     batcher = await WrapOnlyBatcher__factory.connect((await deployments.get('WrapOnlyBatcher')).address, funder)
 
-    dsu = IERC20__factory.connect(EMPTYSET_CONTRACTS.DSU_ADDRESS, funder)
+    dsu = IERC20__factory.connect(EMPTYSET_CONTRACTS.DSU, funder)
     usdc = IERC20__factory.connect(EXTERNAL_CONTRACTS.USDC, funder)
     // reserveImpl2 = await new ReserveImpl2__factory(funder).deploy()
     reserveImpl2 = await new ReserveImpl2__factory(funder).attach(NEW_RESERVE_ADDRESS)
@@ -141,7 +146,7 @@ describe('Empty Set Proposal 002', () => {
 
     context('initialize', async () => {
       it('takes ownership', async () => {
-        expect(await batcher.owner()).to.equal(EMPTYSET_CONTRACTS.TIMELOCK_ADDRESS)
+        expect(await batcher.owner()).to.equal((await deployments.get('EmptySetTimelock')).address)
         expect(await batcher.pendingOwner()).to.equal(ethers.constants.AddressZero)
       })
     })
