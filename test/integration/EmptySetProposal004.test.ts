@@ -10,6 +10,8 @@ import {
   EmptySetReserve__factory,
   ReserveImpl3,
   ReserveImpl3__factory,
+  IERC20,
+  IERC20__factory,
 } from '../../types/generated'
 import { govern, impersonate, time } from '../testutil'
 import { EMPTYSET_CONTRACTS } from '../../proposals/emptyset/contracts'
@@ -18,6 +20,7 @@ import { ES_004, NEW_RESERVE_IMPL_ADDRESS } from '../../proposals/emptyset/es004
 const { ethers, deployments } = HRE
 const PROPOSER_ADDRESS = '0x589CDCf60aea6B961720214e80b713eB66B89A4d' // Equilibria Multisig
 const SUPPORTER_ADDRESSES = ['0x07b991579b4e1Ee01d7a3342AF93E96ecC59E0B3']
+const USDC_HOLDER_ADDRESS = '0xae2d4617c862309a3d75a0ffb358c7a5009c673f'
 
 const USE_REAL_DEPLOY = true
 const FORK_BLOCK = 15410363
@@ -26,7 +29,7 @@ describe('Empty Set Proposal 004', () => {
   let funder: SignerWithAddress
   let proposerSigner: Signer
   let multisigSigner: Signer
-  let timelockSigner: Signer
+  let usdcHolderSigner: SignerWithAddress
   let supporterSigners: Signer[]
   let governor: EmptySetGovernor2
   let newReserveImpl: ReserveImpl3
@@ -49,10 +52,7 @@ describe('Empty Set Proposal 004', () => {
       EMPTYSET_CONTRACTS.GUARDIAN,
       ethers.utils.parseEther('10'),
     )
-    timelockSigner = await impersonate.impersonateWithBalance(
-      EMPTYSET_CONTRACTS.TIMELOCK,
-      ethers.utils.parseEther('10'),
-    )
+    usdcHolderSigner = await impersonate.impersonateWithBalance(USDC_HOLDER_ADDRESS, ethers.utils.parseEther('10'))
     supporterSigners = await Promise.all(
       SUPPORTER_ADDRESSES.map(s => impersonate.impersonateWithBalance(s, ethers.utils.parseEther('10'))),
     )
@@ -91,8 +91,16 @@ describe('Empty Set Proposal 004', () => {
   })
 
   context('guardian', () => {
+    let USDC: IERC20
+    let DSU: IERC20
+
     beforeEach(async () => {
+      USDC = IERC20__factory.connect('0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', usdcHolderSigner)
+      DSU = IERC20__factory.connect(EMPTYSET_CONTRACTS.DSU, usdcHolderSigner)
       newReserveImpl = ReserveImpl3__factory.connect(reserve.address, multisigSigner)
+
+      await USDC.approve(reserve.address, ethers.constants.MaxUint256)
+      await DSU.approve(reserve.address, ethers.constants.MaxUint256)
     })
 
     it('pauses and unpauses', async () => {
@@ -101,16 +109,18 @@ describe('Empty Set Proposal 004', () => {
       await newReserveImpl.setPaused(true)
 
       expect(await newReserveImpl.paused()).to.be.true
-      await expect(newReserveImpl.connect(timelockSigner).borrow(EMPTYSET_CONTRACTS.GUARDIAN, 1000)).to.be.revertedWith(
-        'Implementation: paused',
-      )
+      await expect(newReserveImpl.connect(usdcHolderSigner).mint(1000)).to.be.revertedWith('Implementation: paused')
 
       await newReserveImpl.setPaused(false)
 
       expect(await newReserveImpl.paused()).to.be.false
-      await expect(newReserveImpl.connect(timelockSigner).borrow(EMPTYSET_CONTRACTS.GUARDIAN, 1000)).to.be.revertedWith(
-        'ReserveComptroller: cant borrow',
-      )
+      await expect(newReserveImpl.connect(usdcHolderSigner).mint(1000)).to.not.be.reverted
+
+      await newReserveImpl.setPaused(true)
+      await expect(newReserveImpl.connect(usdcHolderSigner).redeem(1000)).to.be.revertedWith('Implementation: paused')
+
+      await newReserveImpl.setPaused(false)
+      await expect(newReserveImpl.connect(usdcHolderSigner).redeem(1000)).to.not.be.reverted
     })
   })
 })
