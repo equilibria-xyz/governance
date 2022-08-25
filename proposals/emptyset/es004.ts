@@ -1,7 +1,7 @@
 import { EMPTYSET_CONTRACTS } from './contracts'
 import { Proposal } from '../../test/testutil/govern'
 
-export const NEW_RESERVE_IMPL_ADDRESS = ''
+export const NEW_RESERVE_IMPL_ADDRESS = '0x52C64b8998eB7C80b6F526E99E29ABdcC86B841b'
 
 const PROPOSAL_TEXT = `# Add Reserve Pausability
 
