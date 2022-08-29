@@ -3,16 +3,41 @@ import { Proposal } from '../../test/testutil/govern'
 
 export const NEW_RESERVE_IMPL_ADDRESS = '0x52C64b8998eB7C80b6F526E99E29ABdcC86B841b'
 
-const PROPOSAL_TEXT = `# Add Reserve Pausability
+const PROPOSAL_TEXT = `# Add Guardian Pausing
+
+## Authors
+
+@kbrizzle (Equilibria)
 
 ### Motivation
-The current Reserve implementation does not have pausing functionality, this makes it impossible to react quickly in the case of emergencies
+
+Currently, the Empty Set governor is the only mechanism by which privileged actions can be taken. This is the most secure and strict setup, however it does not provide the flexibility for swift actions during incidents.
+
+Other protocols solve this dilemma by introducing a separate role with limited pausing privileges.
 
 ### Overview
-Adds a PAUSER role which can toggle the PAUSED state. The PAUSER is set to the [multisig address](https://etherscan.io/address/0x460661bd4A5364A3ABCc9cfc4a8cE7038d05Ea22).
 
-#### Resources
-- The implementation of the new Reserve can be viewed [here](https://github.com/emptysetsquad/emptyset/pull/32).
+We propose adding a pauser role to the Empty Set protocol alongside the original owner role. This pauser role will have limited privileges to pause and unpause all state-mutating methods within the protocol.
+
+### Permissions Breakdown
+
+\`Pauser\`
+  * Update paused status
+
+\`Owner\` (GovernorAlpha)
+  * Update paused status
+  * Update pauser
+  * Update or remove pausing functionality altogether
+
+#### Implementation
+The implementation of the change can be viewed [here](https://github.com/emptysetsquad/emptyset/pull/32).
+
+#### Operation
+
+Since the protocol multisig already has guardian powers per the GovernorAlpha contract, we propose this multisig as the initial pauser.
+
+### Vote
+The vote will take place on the [governance page](https://app.emptyset.finance/governance) of the Empty Set webapp.
 `
 
 export const ES_004 = (newReserveImplAddress: string = NEW_RESERVE_IMPL_ADDRESS): Proposal => {
