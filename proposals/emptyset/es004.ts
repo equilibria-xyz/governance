@@ -11,23 +11,21 @@ const PROPOSAL_TEXT = `# Add Guardian Pausing
 
 ### Motivation
 
-Currently, the Empty Set governor is the only mechanism by which privileged actions can be taken. This is the most secure and strict setup, however it does not provide the flexibility for swift actions during incidents.
+Currently, the Empty Set governor is the only mechanism by which privileged actions can be taken. This is the most secure and strict setup, however it does not provide the flexibility for swift actions during security incidents.
 
-Other protocols solve this dilemma by introducing a separate role with limited pausing privileges.
+Other protocols solve this dilemma by introducing a separate protocol role with limited pausing privileges.
 
 ### Overview
 
-We propose adding a pauser role to the Empty Set protocol alongside the original owner role. This pauser role will have limited privileges to pause and unpause all state-mutating methods within the protocol.
+We propose adding a pauser role to the Empty Set protocol alongside the original owner role. This pauser role will be set by the owner role and have limited privileges to pause and unpause all state-mutating methods within the protocol.
 
 ### Permissions Breakdown
 
-\`Pauser\`
-  * Update paused status
-
-\`Owner\` (GovernorAlpha)
-  * Update paused status
-  * Update pauser
-  * Update or remove pausing functionality altogether
+\`pauser\`
+Update paused status
+\`owner\` (GovernorAlpha)
+Update or revoke pauser address
+Update or remove pausing functionality altogether
 
 #### Implementation
 The implementation of the change can be viewed [here](https://github.com/emptysetsquad/emptyset/pull/32).
