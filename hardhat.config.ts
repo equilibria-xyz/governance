@@ -13,7 +13,7 @@ import '@nomiclabs/hardhat-waffle'
 import '@nomiclabs/hardhat-etherscan'
 import 'hardhat-gas-reporter'
 import 'hardhat-deploy'
-import { ethers } from 'ethers'
+import 'hardhat-dependency-compiler'
 
 const chainIds = {
   ganache: 1337,
@@ -100,6 +100,9 @@ const config: HardhatUserConfig = {
     currency: 'USD',
     gasPrice: 100,
     enabled: process.env.REPORT_GAS ? true : false,
+  },
+  dependencyCompiler: {
+    paths: ['@openzeppelin/contracts/token/ERC20/IERC20.sol'],
   },
   typechain: {
     outDir: 'types/generated',

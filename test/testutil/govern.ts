@@ -82,7 +82,7 @@ export async function proposeTx(
   proposal: Proposal,
   signer: Signer,
   verbose = true,
-) {
+): Promise<ContractTransaction> {
   const params = proposal.clauses.map(clause => ethers.utils.defaultAbiCoder.encode(clause.argTypes, clause.argValues))
   verbose && console.log(`>>>> Calldatas: ${params}`)
   return await governor.connect(signer).propose(
