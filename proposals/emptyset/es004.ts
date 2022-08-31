@@ -22,10 +22,11 @@ We propose adding a pauser role to the Empty Set protocol alongside the original
 ### Permissions Breakdown
 
 \`pauser\`
-Update paused status
+* Update paused status
+
 \`owner\` (GovernorAlpha)
-Update or revoke pauser address
-Update or remove pausing functionality altogether
+* Update or revoke pauser address
+* Update or remove pausing functionality altogether
 
 #### Implementation
 The implementation of the change can be viewed [here](https://github.com/emptysetsquad/emptyset/pull/32).
