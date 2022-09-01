@@ -29,7 +29,7 @@ const deploy_es004: DeployFunction = async function (hre: HardhatRuntimeEnvironm
 
   const governor = await EmptySetGovernor__factory.connect(
     (
-      await deployments.get('EmptySetGovernor')
+      await deployments.get('EmptySetGovernor2')
     ).address,
     deployer,
   )
