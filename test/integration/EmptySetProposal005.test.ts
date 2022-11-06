@@ -24,8 +24,8 @@ const PROPOSER_ADDRESS = '0x589CDCf60aea6B961720214e80b713eB66B89A4d' // Equilib
 const SUPPORTER_ADDRESSES = ['0x07b991579b4e1Ee01d7a3342AF93E96ecC59E0B3']
 const USDC_HOLDER_ADDRESS = '0xae2d4617c862309a3d75a0ffb358c7a5009c673f'
 
-const USE_REAL_DEPLOY = false
-const FORK_BLOCK = 15901714
+const USE_REAL_DEPLOY = true
+const FORK_BLOCK = 15913658
 
 describe('Empty Set Proposal 005', () => {
   let funder: SignerWithAddress
