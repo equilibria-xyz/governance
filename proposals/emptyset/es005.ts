@@ -1,7 +1,7 @@
 import { EMPTYSET_CONTRACTS } from './contracts'
 import { Proposal } from '../../test/testutil/govern'
 
-export const NEW_V1_DAO_IMPL_ADDRESS = '0xB044E9F0D668C1273E49d7F74FB88f1d0a7Fc250'
+export const NEW_V1_DAO_IMPL_ADDRESS = '0xDC8C5D7645a7a1B4968eC9e1D983940a259B0aDF'
 
 const PROPOSAL_TEXT = `# Sunset V1-to-V2 Migrator
 

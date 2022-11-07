@@ -25,7 +25,7 @@ const SUPPORTER_ADDRESSES = ['0x07b991579b4e1Ee01d7a3342AF93E96ecC59E0B3']
 const USDC_HOLDER_ADDRESS = '0xae2d4617c862309a3d75a0ffb358c7a5009c673f'
 
 const USE_REAL_DEPLOY = true
-const FORK_BLOCK = 15913658
+const FORK_BLOCK = 15921272
 
 describe('Empty Set Proposal 005', () => {
   let funder: SignerWithAddress
