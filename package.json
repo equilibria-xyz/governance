@@ -7,6 +7,7 @@
   "scripts": {
     "build": "yarn compile",
     "compile": "hardhat compile",
+    "propose": "npx hardhat deploy --network mainnet --tags",
     "gasReport": "REPORT_GAS=true yarn test",
     "test": "hardhat test ./test/unit/*",
     "test:integration": "FORK_ENABLED=true hardhat test test/integration/*",

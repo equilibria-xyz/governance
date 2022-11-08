@@ -29,7 +29,7 @@ const MNEMONIC = process.env.MNEMONIC || ''
 const PRIVATE_KEY = process.env.PRIVATE_KEY || ''
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || ''
 const INFURA_API_KEY = process.env.INFURA_API_KEY || ''
-const MAINNET_NODE_URL = process.env.NODE_URL || ''
+const MAINNET_NODE_URL = process.env.MAINNET_NODE_URL || ''
 const FORK_ENABLED = process.env.FORK_ENABLED === 'true' || false
 
 // This is a sample Hardhat task. To learn how to create your own go to
