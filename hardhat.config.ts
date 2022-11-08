@@ -62,7 +62,7 @@ const config: HardhatUserConfig = {
         mnemonic: MNEMONIC,
       },
       forking: {
-        url: `${MAINNET_NODE_URL}`,
+        url: MAINNET_NODE_URL,
         enabled: FORK_ENABLED,
       },
       chainId: chainIds.hardhat,
@@ -73,7 +73,7 @@ const config: HardhatUserConfig = {
     ropsten: createTestnetConfig('ropsten'),
     mainnet: {
       chainId: chainIds.mainnet,
-      url: `${MAINNET_NODE_URL}`,
+      url: MAINNET_NODE_URL,
       accounts: PRIVATE_KEY !== '' ? [PRIVATE_KEY] : [],
     },
   },

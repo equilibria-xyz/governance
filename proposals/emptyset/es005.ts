@@ -15,7 +15,7 @@ The migrator as it stands still holds a large portion of the total ESS supply wh
 - Further discussion [here](https://www.emptyset.xyz/t/close-esd-ess-migration-pathway/347).
 `
 
-export const ES_005 = (newV1DaoImplAddress: string = NEW_V1_DAO_IMPL_ADDRESS): Proposal => {
+export const ES_005 = (newV1DaoImplAddress = NEW_V1_DAO_IMPL_ADDRESS): Proposal => {
   return {
     clauses: [
       {
