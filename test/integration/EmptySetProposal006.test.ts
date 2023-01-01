@@ -20,7 +20,7 @@ import { EXTERNAL_CONTRACTS } from '../../proposals/contracts'
 import { ES_006 } from '../../proposals/emptyset/es006'
 
 const { ethers, deployments } = HRE
-const FORK_BLOCK = 16307564
+const FORK_BLOCK = 16307726
 const PROPOSER_ADDRESS = '0x589CDCf60aea6B961720214e80b713eB66B89A4d' // Equilibria Multisig
 const SUPPORTER_ADDRESSES = ['0x07b991579b4e1Ee01d7a3342AF93E96ecC59E0B3']
 const USDC_HOLDER_ADDRESS = '0xae2d4617c862309a3d75a0ffb358c7a5009c673f'
@@ -31,7 +31,7 @@ const TWO_WAY_BATCHER_ADDRESS = '0xAEf566ca7E84d1E736f999765a804687f39D9094'
 const DSU_AMOUNT = ethers.utils.parseEther('1000000')
 const USDC_AMOUNT = 1000000_000_000
 
-describe.only('Empty Set Proposal 006', () => {
+describe('Empty Set Proposal 006', () => {
   let funder: SignerWithAddress
   let proposerSigner: Signer
   let usdcHolderSigner: SignerWithAddress
@@ -95,7 +95,7 @@ describe.only('Empty Set Proposal 006', () => {
     expect(await dsu.balanceOf(TWO_WAY_BATCHER_ADDRESS)).to.equal(DSU_AMOUNT)
 
     expect(await reserve.debt(TWO_WAY_BATCHER_ADDRESS)).to.equal(DSU_AMOUNT)
-    expect(await reserve.totalDebt()).to.equal(DSU_AMOUNT)
+    expect(await reserve.totalDebt()).to.equal(DSU_AMOUNT.mul(2))
     expect(await reserve.reserveBalance()).to.equal(initialReserveBalance)
     expect((await reserve.redeemPrice()).value).to.equal(ethers.utils.parseEther('1'))
     expect((await reserve.reserveRatio()).value.gt(ethers.utils.parseEther('1'))).to.equal(true)
@@ -120,7 +120,7 @@ describe.only('Empty Set Proposal 006', () => {
       expect(await dsu.balanceOf(user.address)).to.equal(DSU_AMOUNT)
 
       expect(await reserve.debt(TWO_WAY_BATCHER_ADDRESS)).to.equal(DSU_AMOUNT)
-      expect(await reserve.totalDebt()).to.equal(DSU_AMOUNT)
+      expect(await reserve.totalDebt()).to.equal(DSU_AMOUNT.mul(2))
       expect(await reserve.reserveBalance()).to.closeTo(initialReserveBalance.add(USDC_AMOUNT), 100_000)
       expect((await reserve.redeemPrice()).value).to.equal(ethers.utils.parseEther('1'))
       expect((await reserve.reserveRatio()).value.gt(ethers.utils.parseEther('1'))).to.equal(true)
@@ -138,29 +138,29 @@ describe.only('Empty Set Proposal 006', () => {
       expect(await dsu.balanceOf(user.address)).to.equal(0)
 
       expect(await reserve.debt(TWO_WAY_BATCHER_ADDRESS)).to.equal(DSU_AMOUNT)
-      expect(await reserve.totalDebt()).to.equal(DSU_AMOUNT)
+      expect(await reserve.totalDebt()).to.equal(DSU_AMOUNT.mul(2))
       expect(await reserve.reserveBalance()).to.closeTo(initialReserveBalance, 100_000)
       expect((await reserve.redeemPrice()).value).to.equal(ethers.utils.parseEther('1'))
       expect((await reserve.reserveRatio()).value.gt(ethers.utils.parseEther('1'))).to.equal(true)
     })
   })
 
-  describe('WrapOnlyBatcher', () => {
+  describe('TwoWayBatcher', () => {
     beforeEach(async () => {
       await usdc.connect(usdcHolderSigner).transfer(user.address, USDC_AMOUNT)
       await usdc.connect(user).approve(batcher.address, USDC_AMOUNT)
 
-      await usdc.connect(usdcHolderSigner).transfer(batcher.address, USDC_AMOUNT)
-      await batcher.connect(usdcHolderSigner).deposit(USDC_AMOUNT)
+      await usdc.connect(usdcHolderSigner).approve(batcher.address, USDC_AMOUNT)
+      await batcher.connect(usdcHolderSigner).deposit(DSU_AMOUNT)
     })
 
     afterEach(async () => {
       const holderBalanceBefore = await usdc.balanceOf(usdcHolderSigner.address)
-      await expect(batcher.connect(usdcHolderSigner).withdraw(USDC_AMOUNT))
+      await expect(batcher.connect(usdcHolderSigner).withdraw(DSU_AMOUNT))
         .to.emit(batcher, 'Withdraw')
-        .withArgs(user.address, BigNumber.from(USDC_AMOUNT).mul(1e12))
+        .withArgs(usdcHolderSigner.address, BigNumber.from(DSU_AMOUNT))
 
-      expect(await usdc.balanceOf(batcher.address)).to.equal(USDC_AMOUNT)
+      expect(await usdc.balanceOf(batcher.address)).to.equal(0)
       expect(await usdc.balanceOf(usdcHolderSigner.address)).to.equal(holderBalanceBefore.add(USDC_AMOUNT))
     })
 
@@ -217,11 +217,11 @@ describe.only('Empty Set Proposal 006', () => {
 
         await expect(batcher.connect(user).rebalance()).to.emit(batcher, 'Rebalance').withArgs(DSU_AMOUNT, 0)
 
-        expect(await usdc.balanceOf(batcher.address)).to.equal(0)
+        expect(await usdc.balanceOf(batcher.address)).to.equal(USDC_AMOUNT)
         expect(await dsu.balanceOf(batcher.address)).to.equal(DSU_AMOUNT)
 
         expect(await reserve.debt(TWO_WAY_BATCHER_ADDRESS)).to.equal(DSU_AMOUNT)
-        expect(await reserve.totalDebt()).to.equal(DSU_AMOUNT)
+        expect(await reserve.totalDebt()).to.equal(DSU_AMOUNT.mul(2))
         expect(await reserve.reserveBalance()).to.closeTo(initialReserveBalance.add(USDC_AMOUNT), 100_000)
         expect((await reserve.redeemPrice()).value).to.equal(ethers.utils.parseEther('1'))
         expect((await reserve.reserveRatio()).value.gt(ethers.utils.parseEther('1'))).to.equal(true)
@@ -234,11 +234,11 @@ describe.only('Empty Set Proposal 006', () => {
           .to.emit(batcher, 'Rebalance')
           .withArgs(ethers.utils.parseEther('999999.000001'), 0)
 
-        expect(await usdc.balanceOf(batcher.address)).to.equal(0)
+        expect(await usdc.balanceOf(batcher.address)).to.equal(USDC_AMOUNT)
         expect(await dsu.balanceOf(batcher.address)).to.equal(ethers.utils.parseEther('1000000.000001').sub(1))
 
         expect(await reserve.debt(TWO_WAY_BATCHER_ADDRESS)).to.equal(DSU_AMOUNT)
-        expect(await reserve.totalDebt()).to.equal(DSU_AMOUNT)
+        expect(await reserve.totalDebt()).to.equal(DSU_AMOUNT.mul(2))
         expect(await reserve.reserveBalance()).to.closeTo(initialReserveBalance.add(999999_000_001), 100_000)
         expect((await reserve.redeemPrice()).value).to.equal(ethers.utils.parseEther('1'))
         expect((await reserve.reserveRatio()).value.gt(ethers.utils.parseEther('1'))).to.equal(true)
@@ -249,7 +249,7 @@ describe.only('Empty Set Proposal 006', () => {
       it('closes batcher (empty)', async () => {
         await expect(batcher.connect(timelockSigner).close()).to.emit(batcher, 'Close').withArgs(DSU_AMOUNT)
 
-        expect(await usdc.balanceOf(batcher.address)).to.equal(0)
+        expect(await usdc.balanceOf(batcher.address)).to.equal(USDC_AMOUNT)
         expect(await dsu.balanceOf(batcher.address)).to.equal(0)
 
         expect(await reserve.debt(TWO_WAY_BATCHER_ADDRESS)).to.equal(0)
@@ -264,7 +264,7 @@ describe.only('Empty Set Proposal 006', () => {
 
         await expect(batcher.connect(timelockSigner).close()).to.emit(batcher, 'Close').withArgs(DSU_AMOUNT)
 
-        expect(await usdc.balanceOf(batcher.address)).to.equal(0)
+        expect(await usdc.balanceOf(batcher.address)).to.equal(USDC_AMOUNT)
         expect(await dsu.balanceOf(batcher.address)).to.equal(0)
 
         expect(await reserve.debt(TWO_WAY_BATCHER_ADDRESS)).to.equal(0)
@@ -279,7 +279,7 @@ describe.only('Empty Set Proposal 006', () => {
 
         await expect(batcher.connect(timelockSigner).close()).to.emit(batcher, 'Close').withArgs(DSU_AMOUNT)
 
-        expect(await usdc.balanceOf(batcher.address)).to.equal(0)
+        expect(await usdc.balanceOf(batcher.address)).to.equal(USDC_AMOUNT)
         expect(await dsu.balanceOf(batcher.address)).to.equal(0)
 
         expect(await reserve.debt(TWO_WAY_BATCHER_ADDRESS)).to.equal(0)
@@ -296,7 +296,7 @@ describe.only('Empty Set Proposal 006', () => {
           .to.emit(batcher, 'Close')
           .withArgs(ethers.utils.parseEther('1000000.000001').sub(1))
 
-        expect(await usdc.balanceOf(batcher.address)).to.equal(0)
+        expect(await usdc.balanceOf(batcher.address)).to.equal(USDC_AMOUNT)
         expect(await dsu.balanceOf(batcher.address)).to.equal(0)
 
         expect(await reserve.debt(TWO_WAY_BATCHER_ADDRESS)).to.equal(0)
@@ -311,17 +311,17 @@ describe.only('Empty Set Proposal 006', () => {
         await batcher.connect(user).wrap(DSU_AMOUNT, user.address)
         await usdc.connect(usdcHolderSigner).transfer(batcher.address, DEPOSIT_AMOUNT)
 
-        await expect(batcher.connect(timelockSigner).close()).to.emit(batcher, 'Close').withArgs(DSU_AMOUNT)
+        await expect(batcher.connect(timelockSigner).close())
+          .to.emit(batcher, 'Close')
+          .withArgs(DSU_AMOUNT.add(BigNumber.from(DEPOSIT_AMOUNT).mul(1e12)))
 
-        expect(await usdc.balanceOf(batcher.address)).to.equal(0)
+        expect(await usdc.balanceOf(batcher.address)).to.equal(USDC_AMOUNT)
         expect(await dsu.balanceOf(batcher.address)).to.equal(0)
 
         expect(await reserve.debt(TWO_WAY_BATCHER_ADDRESS)).to.equal(0)
         expect(await reserve.totalDebt()).to.equal(DSU_AMOUNT)
-        expect(await reserve.reserveBalance()).to.closeTo(
-          initialReserveBalance.add(USDC_AMOUNT).add(DEPOSIT_AMOUNT),
-          100_000,
-        )
+        expect(await reserve.reserveBalance()).to.closeTo(initialReserveBalance.add(USDC_AMOUNT), 100_000)
+        expect(await usdc.balanceOf(timelockSigner.address)).to.equal(DEPOSIT_AMOUNT)
         expect((await reserve.redeemPrice()).value).to.equal(ethers.utils.parseEther('1'))
         expect((await reserve.reserveRatio()).value.gt(ethers.utils.parseEther('1'))).to.equal(true)
       })
