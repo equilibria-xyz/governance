@@ -19,6 +19,10 @@ We propose a new batcher implementation that supports the permissionless deposit
 
 By holding non-reserve USDC as well as DSU from the reserve’s *trusted borrow* system, we can then enable bidirectional batching. This primarily serves to enable significantly cheaper DSU-to-USDC **unwraps**.
 
+#### Quality of Life
+
+As a housekeeping item, an additional clause to burn any existing ESS held in the reserve has been added on.
+
 #### Resources
 - The Reserve update implementation can be seen [here](https://github.com/equilibria-xyz/emptyset/pull/2).
 - The TwoWay Batcher implementation can be seen [here](https://github.com/equilibria-xyz/emptyset-batcher/blob/master/contracts/batcher/TwoWayBatcher.sol).
