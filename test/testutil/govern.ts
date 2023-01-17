@@ -26,6 +26,7 @@ export async function propose(
   supporters: Signer[] = [],
   compoundGovernor = false,
   verbose = true,
+  executeTxValue = '0',
 ): Promise<ContractTransaction> {
   verbose && console.log('>> Starting Proposal Flow')
   const token: COMP = COMP__factory.connect(tokenAddress, proposer)
@@ -70,7 +71,7 @@ export async function propose(
   verbose && console.log('>> Proposal Queued')
   await time.increase(86400 * 2)
 
-  const txExecute = await governor.connect(proposer).execute(proposalId)
+  const txExecute = await governor.connect(proposer).execute(proposalId, { value: executeTxValue, gasLimit: 30000000 })
   verbose && console.log('>> Proposal Executed')
   expect(await governor.state(proposalId)).to.eq(7) // executed
 
