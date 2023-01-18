@@ -27,17 +27,17 @@ export const ES_007 = (): Proposal => {
       {
         // Uses https://gist.github.com/arjun-io/b4a3c666ea3d59e294298a2a6be14e6c to estimate gas
         to: L1_TO_L2_MESSAGING_CONTRACTS.ARBITRUM,
-        value: '58525380935798',
+        value: '87473645876576',
         method: 'createRetryableTicket(address,uint256,uint256,address,address,uint256,uint256,bytes)',
         argTypes: ['address', 'uint256', 'uint256', 'address', 'address', 'uint256', 'uint256', 'bytes'],
         argValues: [
           ARBITRUM_UCROSSCHAIN_OWNER_ADDRESS, // to
           0, // l2CallValue
-          '47670380935798', // maxSubmissionCost
+          '61781245876576', // maxSubmissionCost
           ABRITRUM_REFUND_ADDRESS, // excessFeeRefundAddress
           ABRITRUM_REFUND_ADDRESS, // callValueRefundAddress
-          '83500', // gasLimit
-          '130000000', // maxFeePerGas
+          '128462', // gasLimit
+          '200000000', // maxFeePerGas
           acceptOwnerIFace.encodeFunctionData('acceptOwner'), // data
         ],
       },

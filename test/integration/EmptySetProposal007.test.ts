@@ -57,7 +57,7 @@ describe('Empty Set Proposal 007', () => {
       supporterSigners,
       false,
       true,
-      '78525380935798',
+      '97473645876576',
     )
   })
 
