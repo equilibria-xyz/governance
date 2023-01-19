@@ -1,6 +1,7 @@
 import { ethers } from 'ethers'
 import { L1_TO_L2_MESSAGING_CONTRACTS } from './contracts'
 import { Proposal } from '../../test/testutil/govern'
+import { WRAP_ONLY_BATCHER_ADDRESS } from './es002'
 
 export const OPTIMISM_UCROSSCHAIN_OWNER_ADDRESS = '0x7b4Adf64B0d60fF97D672E473420203D52562A84'
 export const ARBITRUM_UCROSSCHAIN_OWNER_ADDRESS = '0x7b4Adf64B0d60fF97D672E473420203D52562A84'
@@ -40,6 +41,13 @@ export const ES_007 = (): Proposal => {
           '200000000', // maxFeePerGas
           acceptOwnerIFace.encodeFunctionData('acceptOwner'), // data
         ],
+      },
+      {
+        to: WRAP_ONLY_BATCHER_ADDRESS,
+        value: 0,
+        method: 'close()',
+        argTypes: [],
+        argValues: [],
       },
     ],
     description: PROPOSAL_TEXT,
