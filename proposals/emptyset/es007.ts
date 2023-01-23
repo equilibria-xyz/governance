@@ -9,7 +9,34 @@ const ABRITRUM_REFUND_ADDRESS = '0x66a7fDB96C583c59597de16d8b2B989231415339'
 
 const acceptOwnerIFace = new ethers.utils.Interface(['function acceptOwner()'])
 
-const PROPOSAL_TEXT = ``
+const PROPOSAL_TEXT = `# Accept L2 Ownership
+## Background
+Currently, Empty Set is only deployed on Ethereum L1. With L2’s, particularly Arbitrum and Optimism gaining favor, we want to ensure that DSU is natively available on every chain that it may be useful.
+
+We define a structure for DSU to maintain complexity across deployments
+
+  1. Each chain has a separate Reserve and DSU deployment
+  2. DSU is owned by its corresponding Reserve
+  3. Each Reserve is owned by the L1 DAO through the corresponding bridge
+  4. Each Reserve is pausable by a chain-native multisig with equivalent signers to L1
+
+### L2 Deployments
+We have deployed DSU and the Reserve on Optimism and Arbitrum mainnets. These use bridged USDC as the unit of account
+and a No-Op (held by the Reserve itself) for the depository. This will allow us to get DSU up and running on both
+L2s while more research is done on new depositories.
+
+## Accepting Ownership
+To make the L2 deployments a verified component of the Empty Set Protocol, the ownership is accepted by the L1
+DAO through this proposal. Once executed, the L1 DAO will have all ownership rights over L2 deployments.
+
+## Housekeeping
+As part of the TwoWayBatcher deployment, we are deprecating the WrapOnlyBatcher by sending a 'close' transaction to
+repay all outstanding debt.
+
+#### Resources
+- The implementation can be viewed [here](https://github.com/equilibria-xyz/emptyset-mono/tree/master/packages)
+- Further discussion [here](https://www.emptyset.xyz/t/l2-launch-strategy/351).
+`
 
 export const ES_007 = (): Proposal => {
   return {
