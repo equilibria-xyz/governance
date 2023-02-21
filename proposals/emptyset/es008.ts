@@ -11,7 +11,9 @@ Back in March 2021, the DeFi Pulse team was hired to lead business development &
 
 At the request of the DeFi Pulse team, we propose to end the token stream currently being allocated to them. The DeFi Pulse team as of their recent pivot, has moved on to other activities and is no longer performing this role.
 
-To execute this, the DAO will call \`.revoke(ESS)\` on the address of their [vesting contract](https://etherscan.io/address/0xaC4673a22A0A292Da0c975690d1463253Ad26DdF#readContract). This will pause the stream. The remaining unvested tokens will then be returned to the DAO and burned.
+To execute this, the DAO will call \`.revoke(ESS)\` on the address of their [vesting contract](https://etherscan.io/address/0xaC4673a22A0A292Da0c975690d1463253Ad26DdF#readContract). This will pause the stream and transfer the unvested amount to the Timelock.
+
+In a followup proposal, the unvested tokens will be returned to the DAO and burned.
 `
 
 export const ES_008 = (): Proposal => {
