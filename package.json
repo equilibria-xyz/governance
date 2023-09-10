@@ -35,7 +35,7 @@
     "@types/node": "^14.14.10",
     "@typescript-eslint/eslint-plugin": "^4.26.1",
     "@typescript-eslint/parser": "^4.26.1",
-    "@walletconnect/web3-provider": "^1.7.1",
+    "@walletconnect/ethereum-provider": "2.10.0",
     "chai": "^4.2.0",
     "dotenv": "^8.2.0",
     "eslint": "^7.28.0",
@@ -62,5 +62,8 @@
     "*.{ts,.js}": "eslint --ext '.ts,.js' ./",
     "*.sol": "solhint 'contracts/**/*.sol' --fix",
     "*.*": "prettier --write"
+  },
+  "dependencies": {
+    "lokijs": "^1.5.12"
   }
 }
