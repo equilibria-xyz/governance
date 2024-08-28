@@ -5,7 +5,18 @@ import { Proposal } from '../../test/testutil/govern'
 const proxyAdminIface = new ethers.utils.Interface(['function upgrade(address,address)'])
 const xchainOwnerIface = new ethers.utils.Interface(['function execute(address,bytes,uint256)'])
 
-const PROPOSAL_TEXT = ``
+const PROPOSAL_TEXT = `
+## Motivation
+
+The Emptyset DAO treasury has COMP rewards & has accrued interest in the form of cUSDC. We propose an open order on the DAO to acquire ESS tokens in the treasury. We also propose to migrate Optimism DSU to native USDC.
+
+## Overview
+
+This proposal aims to accomplish three main objectives:
+ * Sell a portion of our cUSDC holdings for ESS
+ * Sell accumulated COMP for ESS
+ * Upgrade the Optimism reserve to use native USDC for deposits and redemptions
+`
 
 const ownerExecuteUpgradeCalldata = xchainOwnerIface.encodeFunctionData('execute', [
   '0x16b38364bA6f55B6E150cC7f52D22E89643f3535', // ProxyAdmin
