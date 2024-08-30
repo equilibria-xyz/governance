@@ -7,11 +7,9 @@ const xchainOwnerIface = new ethers.utils.Interface(['function execute(address,b
 
 const PROPOSAL_TEXT = `
 ## Motivation
-
 The Emptyset DAO treasury has COMP rewards & has accrued interest in the form of cUSDC. We propose an open order on the DAO to acquire ESS tokens in the treasury. We also propose to migrate Optimism DSU to native USDC.
 
 ## Overview
-
 This proposal aims to accomplish three main objectives:
  * Sell a portion of our cUSDC holdings for ESS
  * Sell accumulated COMP for ESS
