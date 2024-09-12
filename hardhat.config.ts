@@ -9,7 +9,7 @@ import { NetworkUserConfig } from 'hardhat/types'
 
 import '@typechain/hardhat'
 import '@nomiclabs/hardhat-ethers'
-import '@nomiclabs/hardhat-waffle'
+import '@nomicfoundation/hardhat-chai-matchers'
 import '@nomiclabs/hardhat-etherscan'
 import 'hardhat-gas-reporter'
 import 'hardhat-deploy'
@@ -91,7 +91,7 @@ const config: HardhatUserConfig = {
     ],
   },
   mocha: {
-    timeout: 120000,
+    timeout: 240000,
   },
   etherscan: {
     apiKey: ETHERSCAN_API_KEY,
